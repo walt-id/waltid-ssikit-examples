@@ -23,6 +23,10 @@ dependencies {
     // Kotlin
     implementation(kotlin("stdlib"))
 
+    // JSON
+    implementation("com.beust:klaxon:5.5")
+
+
     // Testing
     testImplementation("io.kotest:kotest-runner-junit5:4.6.1")
     testImplementation("io.kotest:kotest-assertions-core:4.6.1")
