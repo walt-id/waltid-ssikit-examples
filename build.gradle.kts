@@ -11,6 +11,7 @@ repositories {
     mavenCentral()
     maven("https://maven.walt.id/repository/waltid/")
     maven("https://maven.walt.id/repository/waltid-ssi-kit/")
+    maven("https://maven.walt.id/repository/danubetech")
     maven("https://repo.danubetech.com/repository/maven-releases/")
     maven("https://jitpack.io")
 }
