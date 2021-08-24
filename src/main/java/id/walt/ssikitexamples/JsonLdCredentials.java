@@ -13,7 +13,7 @@ import id.walt.vclib.vclist.VerifiableAttestation;
 
 import java.util.List;
 
-public class JsonLDCredentials {
+public class JsonLdCredentials {
     private Signatory signatory = Signatory.Companion.getService();
     private JsonLdCredentialService credentialService = JsonLdCredentialService.Companion.getService();
     private KeyService keyService = KeyService.Companion.getService();
@@ -52,6 +52,6 @@ public class JsonLDCredentials {
     }
 
     public static void main(String[] args) {
-        new JsonLDCredentials().run();
+        new JsonLdCredentials().run();
     }
 }
