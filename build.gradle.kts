@@ -13,20 +13,21 @@ repositories {
     maven("https://maven.walt.id/repository/waltid-ssi-kit/")
     maven("https://maven.walt.id/repository/danubetech")
     maven("https://repo.danubetech.com/repository/maven-releases/")
+    maven("https://repo.danubetech.com/repository/maven-snapshots/")
     maven("https://jitpack.io")
 }
 
 dependencies {
     // Walt.ID
-    implementation("id.walt:waltid-ssi-kit:1.0-SNAPSHOT4")
-    //implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.0.1")
+    implementation("id.walt:waltid-ssi-kit:1.0-SNAPSHOT")
+    implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.0.1")
+    implementation("id.walt:waltid-ssikit-vclib:1.4.3")
 
     // Kotlin
     implementation(kotlin("stdlib"))
 
     // JSON
     implementation("com.beust:klaxon:5.5")
-
 
     // Testing
     testImplementation("io.kotest:kotest-runner-junit5:4.6.1")

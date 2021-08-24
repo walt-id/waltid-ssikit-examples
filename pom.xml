@@ -108,7 +108,7 @@
         <dependency>
             <groupId>id.walt</groupId>
             <artifactId>waltid-ssi-kit</artifactId>
-            <version>1.0-SNAPSHOT4</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
