@@ -14,5 +14,6 @@ Build with **Maven**
 
 ### Examples
 
+- **KeyManagement** - shows how to generate, to import/export and to delete cryptographic keys.
 - **JsonLdCredentials** - shows the creation of DIDs as well as the issuance/verification of JSON LD based credentials.
 - **DidEbsi** - shows the creation and anchoring of a **did:ebsi** on the EBSI ledger.
