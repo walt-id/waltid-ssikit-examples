@@ -11,19 +11,20 @@ import id.walt.signatory.ProofConfig
 import id.walt.signatory.Signatory
 import id.walt.vclib.vclist.VerifiableAttestation
 
-// Define used services
-val signatory = Signatory.getService()
-val credentialService = JsonLdCredentialService.getService()
-val keyService = KeyService.getService()
-
 fun main() {
     // Load Walt.ID SSI-Kit services from "$workingDirectory/service-matrix.properties"
     ServiceMatrix("service-matrix.properties")
 
+    // Define used services
+    val signatory = Signatory.getService()
+    val credentialService = JsonLdCredentialService.getService()
+    val keyService = KeyService.getService()
+
+
     /* Use services... */
     // generate key pairs for holder, issuer
     val holderKey = keyService.generate(KeyAlgorithm.EdDSA_Ed25519)
-    val issuerKey = keyService.generate(KeyAlgorithm.EdDSA_Ed25519)
+    val issuerKey = keyService.generate(KeyAlgorithm.ECDSA_Secp256k1)
 
     // create dids, using did:key
     val holderDid = DidService.create(DidMethod.key, holderKey.id)
