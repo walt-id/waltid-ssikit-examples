@@ -1,6 +1,9 @@
 package id.walt.ssikitexamples
 
 import com.beust.klaxon.Klaxon
+import id.walt.auditor.AuditorService
+import id.walt.auditor.JsonSchemaPolicy
+import id.walt.auditor.SignaturePolicy
 import id.walt.crypto.KeyAlgorithm
 import id.walt.model.DidMethod
 import id.walt.servicematrix.ServiceMatrix
@@ -48,5 +51,15 @@ fun main() {
     val signedVC = credentialService.sign(Klaxon().toJsonString(vcTemplate), ProofConfig(issuerDid = issuerDid))
 
     // verify credential
-    println("VC verified: ${credentialService.verifyVc(issuerDid, signedVC)}")
+    val verificationResult = AuditorService.verify(signedVC, listOf(SignaturePolicy(), JsonSchemaPolicy()))
+    println("VC verified: ${verificationResult.overallStatus}")
+    verificationResult.policyResults.forEach { policy, result -> println("${policy}: ${result}") }
+
+    // present credential
+    var vp = credentialService.present(signedVC, "https://api.preprod.ebsi.eu", "d04442d3-661f-411e-a80f-42f19f594c9d")
+
+    // verify presentation
+    val verificationResultVp = AuditorService.verify(vp, listOf(SignaturePolicy(), JsonSchemaPolicy()))
+    println("VP verified: ${verificationResultVp.overallStatus}")
+    verificationResultVp.policyResults.forEach { policy, result -> println("${policy}: ${result}") }
 }
