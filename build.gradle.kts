@@ -21,7 +21,7 @@ dependencies {
     // Walt.ID
     implementation("id.walt:waltid-ssi-kit:1.0-SNAPSHOT")
     implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.0.1")
-    implementation("id.walt:waltid-ssikit-vclib:1.4.3")
+    implementation("id.walt:waltid-ssikit-vclib:1.4.5")
 
     // Kotlin
     implementation(kotlin("stdlib"))

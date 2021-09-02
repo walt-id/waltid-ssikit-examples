@@ -27,7 +27,7 @@ fun main() {
     /* Use services... */
     // generate key pairs for holder, issuer
     val holderKey = keyService.generate(KeyAlgorithm.EdDSA_Ed25519)
-    val issuerKey = keyService.generate(KeyAlgorithm.ECDSA_Secp256k1)
+    val issuerKey = keyService.generate(KeyAlgorithm.EdDSA_Ed25519)
 
     // create dids, using did:key
     val holderDid = DidService.create(DidMethod.key, holderKey.id)
