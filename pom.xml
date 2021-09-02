@@ -49,7 +49,7 @@
 
         <repository>
             <id>danubetech</id>
-            <url>https://repo.danubetech.com/repository/maven-releases/</url>
+            <url>https://repo.danubetech.com/repository/maven-public/</url>
         </repository>
 
         <repository>
