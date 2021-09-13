@@ -4,7 +4,6 @@ import id.walt.crypto.KeyAlgorithm;
 import id.walt.model.DidMethod;
 import id.walt.servicematrix.ServiceMatrix;
 import id.walt.services.did.DidService;
-import id.walt.services.essif.EssifFlowRunner;
 import id.walt.services.essif.didebsi.DidEbsiService;
 import id.walt.services.key.KeyService;
 
@@ -47,9 +46,9 @@ public class DidEbsi {
         // Pre requisite: put token from https://app.preprod.ebsi.eu/users-onboarding/ in file data/ebsi/bearer-token.txt
         ///////////////////////////////////////////////////////////////////////////
 
-        EssifFlowRunner.INSTANCE.onboard(didEbsi);
+        //EssifFlowRunner.INSTANCE.onboard(didEbsi);
 
-        EssifFlowRunner.INSTANCE.authApi(didEbsi);
+        //EssifFlowRunner.INSTANCE.authApi(didEbsi);
 
         didEbsiService.registerDid(didEbsi, ethKeyId.getId());
 

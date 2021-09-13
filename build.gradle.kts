@@ -10,7 +10,7 @@ version = "1.0-SNAPSHOT"
 repositories {
     mavenCentral()
     maven("https://maven.walt.id/repository/waltid/")
-    maven("https://maven.walt.id/repository/waltid-ssi-kit/")
+    //maven("https://maven.walt.id/repository/waltid-ssi-kit/")
     maven("https://maven.walt.id/repository/danubetech")
     maven("https://repo.danubetech.com/repository/maven-public/")
     maven("https://jitpack.io")
@@ -21,7 +21,7 @@ dependencies {
     // Walt.ID
     implementation("id.walt:waltid-ssi-kit:1.0-SNAPSHOT")
     implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.0.1")
-    implementation("id.walt:waltid-ssikit-vclib:1.4.5")
+    implementation("id.walt:waltid-ssikit-vclib:1.4.7-SNAPSHOT")
 
     // Kotlin
     implementation(kotlin("stdlib"))
