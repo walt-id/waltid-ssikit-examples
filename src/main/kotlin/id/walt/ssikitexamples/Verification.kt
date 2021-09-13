@@ -10,19 +10,26 @@ import id.walt.model.DidMethod
 import id.walt.servicematrix.ServiceMatrix
 import id.walt.services.did.DidService
 import id.walt.services.key.KeyService
+import id.walt.signatory.DataProviderRegistry
 import id.walt.signatory.ProofConfig
 import id.walt.signatory.ProofType
 import id.walt.signatory.Signatory
 import id.walt.vclib.model.VerifiableCredential
 import id.walt.vclib.vclist.VerifiableDiploma
+import id.walt.vclib.vclist.VerifiableId
 
 class MyCustomPolicy : VerificationPolicy {
     override val description: String
         get() = "A custom verification policy"
 
     override fun verify(vc: VerifiableCredential): Boolean {
-        // TODO: implement custom verification method here
-        return true
+        if (vc is VerifiableId) {
+            val idData = MockedIdDatabase.get(vc.credentialSubject!!.id!!)
+            if(idData != null) {
+                return idData.familyName == vc.credentialSubject?.familyName && idData.firstName == vc.credentialSubject?.firstName
+            }
+        }
+        return false
     }
 }
 
@@ -34,19 +41,21 @@ fun main() {
     ServiceMatrix("service-matrix.properties")
 
     // Create VCs to verify:
+    val idIter = MockedIdDatabase.mockedIds.keys.iterator()
+    val holder = idIter.next()
+    val issuer = idIter.next()
 
-    // create dids, using did:key and newly generated keys
-    val holderDid = DidService.create(DidMethod.key)
-    val issuerDid = DidService.create(DidMethod.key)
+    // Register custom data provider
+    DataProviderRegistry.register(VerifiableId::class, CustomIdDataProvider())
 
     // issue VC in JSON-LD and JWT format (for show-casing both formats)
     val vcJson = signatory.issue(
-        "VerifiableDiploma",
-        ProofConfig(issuerDid = issuerDid, subjectDid = holderDid, proofType = ProofType.LD_PROOF)
+        "VerifiableId",
+        ProofConfig(issuerDid = issuer, subjectDid = holder, proofType = ProofType.LD_PROOF)
     )
     val vcJwt = signatory.issue(
-        "VerifiableDiploma",
-        ProofConfig(issuerDid = issuerDid, subjectDid = holderDid, proofType = ProofType.JWT)
+        "VerifiableId",
+        ProofConfig(issuerDid = issuer, subjectDid = holder, proofType = ProofType.JWT)
     )
 
     // present VC in JSON-LD and JWT format (for show-casing both formats)
