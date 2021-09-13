@@ -17,6 +17,7 @@ import id.walt.signatory.Signatory
 import id.walt.vclib.model.VerifiableCredential
 import id.walt.vclib.vclist.VerifiableDiploma
 import id.walt.vclib.vclist.VerifiableId
+import id.walt.vclib.vclist.VerifiablePresentation
 
 class MyCustomPolicy : VerificationPolicy {
     override val description: String
@@ -28,6 +29,9 @@ class MyCustomPolicy : VerificationPolicy {
             if(idData != null) {
                 return idData.familyName == vc.credentialSubject?.familyName && idData.firstName == vc.credentialSubject?.firstName
             }
+        } else if (vc is VerifiablePresentation) {
+            // This custom policy does not verify the VerifiablePresentation
+            return true
         }
         return false
     }
@@ -48,7 +52,7 @@ fun main() {
     // Register custom data provider
     DataProviderRegistry.register(VerifiableId::class, CustomIdDataProvider())
 
-    // issue VC in JSON-LD and JWT format (for show-casing both formats)
+    // Issue VC in JSON-LD and JWT format (for show-casing both formats)
     val vcJson = signatory.issue(
         "VerifiableId",
         ProofConfig(issuerDid = issuer, subjectDid = holder, proofType = ProofType.LD_PROOF)
@@ -58,11 +62,11 @@ fun main() {
         ProofConfig(issuerDid = issuer, subjectDid = holder, proofType = ProofType.JWT)
     )
 
-    // present VC in JSON-LD and JWT format (for show-casing both formats)
+    // Present VC in JSON-LD and JWT format (for show-casing both formats)
     val vpJson = custodian.createPresentation(vcJson, null, null)
     val vpJwt = custodian.createPresentation(vcJwt, null, null)
 
-    // verify VPs, using Signature, JsonSchema and a custom policy policies
+    // Verify VPs, using Signature, JsonSchema and a custom policy policies
     val resJson = AuditorService.verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
     val resJwt = AuditorService.verify(vpJwt, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
 
