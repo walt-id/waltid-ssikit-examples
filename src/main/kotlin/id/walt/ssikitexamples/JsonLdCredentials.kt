@@ -40,9 +40,7 @@ fun main() {
         println("$index: $templateName")
     }
 
-    // Get default VC template from VCService
-    println("Default VC template: ${credentialService.defaultVcTemplate()}")
-
+    // Prepare VC template
     var vcTemplate = VerifiableAttestation(
         listOf("https://www.w3.org/2018/credentials/v1"),
         "VerifiableAttestation",

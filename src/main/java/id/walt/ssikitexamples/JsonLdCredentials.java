@@ -8,6 +8,7 @@ import id.walt.services.did.DidService;
 import id.walt.services.key.KeyService;
 import id.walt.services.vc.JsonLdCredentialService;
 import id.walt.signatory.ProofConfig;
+import id.walt.signatory.ProofType;
 import id.walt.signatory.Signatory;
 import id.walt.vclib.vclist.VerifiableAttestation;
 
@@ -36,14 +37,12 @@ public class JsonLdCredentials {
         // List registered VC templates
         signatory.listTemplates().forEach(templateName -> System.out.println(templateName));
 
-        // Get default VC template from VCService
-        System.out.println("Default VC template: " + credentialService.defaultVcTemplate().toString());
-
+        // Prepare VC template
         var vcTemplate = new VerifiableAttestation(List.of("https://www.w3.org/2018/credentials/v1"), "VerifiableAttestation", issuerDid, null, null, null, null, null, null, null);
         vcTemplate.setCredentialSubject(new VerifiableAttestation.CredentialSubject(holderDid));
 
         var credentialJson = new Klaxon().toJsonString(vcTemplate, null);
-        var proofConfig = new ProofConfig(issuerDid, null, null, null, null, null, null, null, null, null);
+        var proofConfig = new ProofConfig(issuerDid, null, null, ProofType.LD_PROOF, null, null, null, null, null, null);
         var signedVC = credentialService.sign(credentialJson, proofConfig);
 
         // verify credential
