@@ -150,7 +150,7 @@
         <dependency>
             <groupId>id.walt</groupId>
             <artifactId>waltid-ssikit-vclib</artifactId>
-            <version>1.4.3</version>
+            <version>1.4.7</version>
         </dependency>
 
         <dependency>
