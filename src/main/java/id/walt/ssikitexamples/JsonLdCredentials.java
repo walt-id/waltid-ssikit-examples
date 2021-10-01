@@ -42,7 +42,7 @@ public class JsonLdCredentials {
         vcTemplate.setCredentialSubject(new VerifiableAttestation.CredentialSubject(holderDid));
 
         var credentialJson = new Klaxon().toJsonString(vcTemplate, null);
-        var proofConfig = new ProofConfig(issuerDid, null, null, ProofType.LD_PROOF, null, null, null, null, null, null);
+        var proofConfig = new ProofConfig(issuerDid, null, null, null, ProofType.LD_PROOF, null, null, null, null, null, null, null);
         var signedVC = credentialService.sign(credentialJson, proofConfig);
 
         // verify credential

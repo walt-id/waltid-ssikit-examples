@@ -63,8 +63,8 @@ fun main() {
     )
 
     // Present VC in JSON-LD and JWT format (for show-casing both formats)
-    val vpJson = custodian.createPresentation(vcJson, null, null)
-    val vpJwt = custodian.createPresentation(vcJwt, null, null)
+    val vpJson = custodian.createPresentation(listOf(vcJson), holder, null, null, null)
+    val vpJwt = custodian.createPresentation(listOf(vcJwt), holder, null, null, null)
 
     // Verify VPs, using Signature, JsonSchema and a custom policy policies
     val resJson = AuditorService.verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
