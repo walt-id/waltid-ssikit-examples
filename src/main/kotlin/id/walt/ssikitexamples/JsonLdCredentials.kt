@@ -55,7 +55,7 @@ fun main() {
     verificationResult.policyResults.forEach { policy, result -> println("${policy}: ${result}") }
 
     // present credential
-    var vp = credentialService.present(signedVC, "https://api.preprod.ebsi.eu", "d04442d3-661f-411e-a80f-42f19f594c9d")
+    var vp = credentialService.present(listOf(signedVC), holderDid, "https://api.preprod.ebsi.eu", "d04442d3-661f-411e-a80f-42f19f594c9d")
 
     // verify presentation
     val verificationResultVp = AuditorService.verify(vp, listOf(SignaturePolicy(), JsonSchemaPolicy()))

@@ -26,7 +26,7 @@ class MyCustomPolicy : VerificationPolicy {
     override fun verify(vc: VerifiableCredential): Boolean {
         if (vc is VerifiableId) {
             val idData = MockedIdDatabase.get(vc.credentialSubject!!.id!!)
-            if(idData != null) {
+            if (idData != null) {
                 return idData.familyName == vc.credentialSubject?.familyName && idData.firstName == vc.credentialSubject?.firstName
             }
         } else if (vc is VerifiablePresentation) {
@@ -53,20 +53,14 @@ fun main() {
     DataProviderRegistry.register(VerifiableId::class, CustomIdDataProvider())
 
     // Issue VC in JSON-LD and JWT format (for show-casing both formats)
-    val vcJson = signatory.issue(
-        "VerifiableId",
-        ProofConfig(issuerDid = issuer, subjectDid = holder, proofType = ProofType.LD_PROOF)
-    )
-    val vcJwt = signatory.issue(
-        "VerifiableId",
-        ProofConfig(issuerDid = issuer, subjectDid = holder, proofType = ProofType.JWT)
-    )
+    val vcJson = signatory.issue("VerifiableId", ProofConfig(issuerDid = issuer, subjectDid = holder, proofType = ProofType.LD_PROOF))
+    val vcJwt = signatory.issue("VerifiableId", ProofConfig(issuerDid = issuer, subjectDid = holder, proofType = ProofType.JWT))
 
     // Present VC in JSON-LD and JWT format (for show-casing both formats)
-    val vpJson = custodian.createPresentation(vcJson, null, null)
-    val vpJwt = custodian.createPresentation(vcJwt, null, null)
+    val vpJson = custodian.createPresentation(listOf(vcJson), holder)
+    val vpJwt = custodian.createPresentation(listOf(vcJwt), holder)
 
-    // Verify VPs, using Signature, JsonSchema and a custom policy policies
+    // Verify VPs, using Signature, JsonSchema and a custom policy
     val resJson = AuditorService.verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
     val resJwt = AuditorService.verify(vpJwt, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
 
