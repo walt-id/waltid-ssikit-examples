@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.5.21"
+    kotlin("jvm") version "1.5.31"
     java
     application
 }
@@ -21,18 +21,13 @@ dependencies {
     // Walt.ID
     implementation("id.walt:waltid-ssi-kit:1.0-SNAPSHOT")
     implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.0.1")
-    implementation("id.walt:waltid-ssikit-vclib:1.4.7")
+    implementation("id.walt:waltid-ssikit-vclib:1.4.9")
 
     // Kotlin
     implementation(kotlin("stdlib"))
 
     // JSON
     implementation("com.beust:klaxon:5.5")
-
-    // Testing
-    testImplementation("io.kotest:kotest-runner-junit5:4.6.1")
-    testImplementation("io.kotest:kotest-assertions-core:4.6.1")
-    testImplementation("io.kotest:kotest-assertions-json:4.6.1")
 }
 
 tasks.withType<Test> {
