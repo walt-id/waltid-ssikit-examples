@@ -12,18 +12,18 @@ class CustomIdDataProvider : SignatoryDataProvider {
     override fun populate(template: VerifiableCredential, proofConfig: ProofConfig): VerifiableCredential {
         if(template is VerifiableId) {
             // get ID data for the given subject
-            val idData = MockedIdDatabase.get(proofConfig.subjectDid!!)
+            val idData = MockedIdDatabase.get(proofConfig.dataProviderIdentifier!!)
             if(idData == null) {
                 throw Exception("No ID data found for the given subject did")
             }
-            template.id = proofConfig.id ?: "identity#verifiableID#${UUID.randomUUID()}"
+            template.id = proofConfig.credentialId ?: "identity#verifiableID#${UUID.randomUUID()}"
             template.issuer = proofConfig.issuerDid
             if (proofConfig.issueDate != null) template.issuanceDate = dateFormat.format(proofConfig.issueDate)
             if (proofConfig.expirationDate != null) template.expirationDate = dateFormat.format(proofConfig.expirationDate)
             template.validFrom = template.issuanceDate
             template.evidence!!.verifier = proofConfig.issuerDid
             template.credentialSubject = VerifiableId.CredentialSubject(
-                idData.id,
+                idData.did,
                 idData.familyName,
                 idData.firstName,
                 idData.dateOfBirth,
