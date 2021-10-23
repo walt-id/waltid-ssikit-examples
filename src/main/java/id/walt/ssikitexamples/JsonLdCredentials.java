@@ -15,9 +15,13 @@ import id.walt.vclib.vclist.VerifiableAttestation;
 import java.util.List;
 
 public class JsonLdCredentials {
-    private Signatory signatory = Signatory.Companion.getService();
-    private JsonLdCredentialService credentialService = JsonLdCredentialService.Companion.getService();
-    private KeyService keyService = KeyService.Companion.getService();
+    private final Signatory signatory = Signatory.Companion.getService();
+    private final JsonLdCredentialService credentialService = JsonLdCredentialService.Companion.getService();
+    private final KeyService keyService = KeyService.Companion.getService();
+
+    public static void main(String[] args) {
+        new JsonLdCredentials().run();
+    }
 
     public void run() {
         // Load Walt.ID SSI-Kit services from "$workingDirectory/service-matrix.properties"
@@ -35,22 +39,22 @@ public class JsonLdCredentials {
         // issue verifiable credential
 
         // List registered VC templates
-        signatory.listTemplates().forEach(templateName -> System.out.println(templateName));
+        signatory.listTemplates().forEach(System.out::println);
 
         // Prepare VC template
         var vcTemplate = new VerifiableAttestation(List.of("https://www.w3.org/2018/credentials/v1"), "VerifiableAttestation", issuerDid, null, null, null, null, null, null, null);
         vcTemplate.setCredentialSubject(new VerifiableAttestation.CredentialSubject(holderDid));
 
         var credentialJson = new Klaxon().toJsonString(vcTemplate, null);
-        var proofConfig = new ProofConfig(issuerDid, holderDid, null, null, ProofType.LD_PROOF, null, null, null, null, null, null, null);
+        var proofConfig = new ProofConfig(
+                issuerDid, holderDid, null, null, ProofType.LD_PROOF, null,
+                null, null, null, null, null, null,
+                null
+        );
         var signedVC = credentialService.sign(credentialJson, proofConfig);
 
         // verify credential
         var verified = credentialService.verifyVc(issuerDid, signedVC);
-        System.out.println("Verified: " + Boolean.toString(verified));
-    }
-
-    public static void main(String[] args) {
-        new JsonLdCredentials().run();
+        System.out.println("Verified: " + verified);
     }
 }
