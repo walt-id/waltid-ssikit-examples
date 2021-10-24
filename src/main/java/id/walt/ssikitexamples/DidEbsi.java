@@ -10,9 +10,12 @@ import id.walt.services.key.KeyService;
 
 public class DidEbsi {
 
-    private KeyService keyService = KeyService.Companion.getService();
-    private DidEbsiService didEbsiService = DidEbsiService.Companion.getService();
+    private final KeyService keyService = KeyService.Companion.getService();
+    private final DidEbsiService didEbsiService = DidEbsiService.Companion.getService();
 
+    public static void main(String[] args) {
+        new DidEbsi().run();
+    }
 
     public void run() {
 
@@ -58,9 +61,5 @@ public class DidEbsi {
         System.out.print("\nCheck EBSI API at https://api.preprod.ebsi.eu/docs/?urls.primaryName=DID%20Registry%20API:\n");
 
 
-    }
-
-    public static void main(String[] args) {
-        new DidEbsi().run();
     }
 }

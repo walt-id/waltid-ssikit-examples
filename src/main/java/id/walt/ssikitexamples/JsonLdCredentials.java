@@ -15,9 +15,13 @@ import id.walt.vclib.vclist.VerifiableAttestation;
 import java.util.List;
 
 public class JsonLdCredentials {
-    private Signatory signatory = Signatory.Companion.getService();
-    private JsonLdCredentialService credentialService = JsonLdCredentialService.Companion.getService();
-    private KeyService keyService = KeyService.Companion.getService();
+    private final Signatory signatory = Signatory.Companion.getService();
+    private final JsonLdCredentialService credentialService = JsonLdCredentialService.Companion.getService();
+    private final KeyService keyService = KeyService.Companion.getService();
+
+    public static void main(String[] args) {
+        new JsonLdCredentials().run();
+    }
 
     public void run() {
         // Load Walt.ID SSI-Kit services from "$workingDirectory/service-matrix.properties"
@@ -47,10 +51,6 @@ public class JsonLdCredentials {
 
         // verify credential
         var verified = credentialService.verifyVc(issuerDid, signedVC);
-        System.out.println("Verified: " + Boolean.toString(verified));
-    }
-
-    public static void main(String[] args) {
-        new JsonLdCredentials().run();
+        System.out.println("Verified: " + verified);
     }
 }
