@@ -19,7 +19,7 @@ fun main() {
     ServiceMatrix("service-matrix.properties")
 
     // Register custom data provider
-    DataProviderRegistry.register(CustomCredential::class, CustomIdDataProvider())
+    DataProviderRegistry.register(CustomCredential::class, CustomDataProvider())
 
     // Registering custom verification policy
     PolicyRegistry.register(MyCustomPolicy())
@@ -55,3 +55,20 @@ fun main() {
 //    println("JWT verification result: ${resJwt.overallStatus}")
 }
 
+class CustomDataProvider : SignatoryDataProvider {
+    override fun populate(template: VerifiableCredential, proofConfig: ProofConfig): VerifiableCredential {
+        if (template is CustomCredential) {
+            template.apply {
+                id = "identity#verifiableID#${UUID.randomUUID()}"
+                issuer = proofConfig.issuerDid
+                credentialSubject?.apply {
+                    givenName = "John"
+                    birthDate = "1958-08-17"
+                }
+            }
+            return template
+        } else {
+            throw IllegalArgumentException("Only VerifiableId is supported by this data provider")
+        }
+    }
+}
