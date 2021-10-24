@@ -1,21 +1,16 @@
 package id.walt.ssikitexamples
 
-import id.walt.auditor.AuditorService
+import id.walt.auditor.Auditor
 import id.walt.auditor.JsonSchemaPolicy
 import id.walt.auditor.SignaturePolicy
 import id.walt.auditor.VerificationPolicy
-import id.walt.crypto.KeyAlgorithm
-import id.walt.custodian.CustodianService
-import id.walt.model.DidMethod
+import id.walt.custodian.Custodian
 import id.walt.servicematrix.ServiceMatrix
-import id.walt.services.did.DidService
-import id.walt.services.key.KeyService
 import id.walt.signatory.DataProviderRegistry
 import id.walt.signatory.ProofConfig
 import id.walt.signatory.ProofType
 import id.walt.signatory.Signatory
 import id.walt.vclib.model.VerifiableCredential
-import id.walt.vclib.vclist.VerifiableDiploma
 import id.walt.vclib.vclist.VerifiableId
 import id.walt.vclib.vclist.VerifiablePresentation
 

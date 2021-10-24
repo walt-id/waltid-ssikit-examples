@@ -4,14 +4,13 @@ import id.walt.auditor.AuditorRestAPI
 import id.walt.auditor.PolicyRegistry
 import id.walt.servicematrix.ServiceMatrix
 import id.walt.signatory.DataProviderRegistry
-import id.walt.signatory.SignatoryRestAPI
+import id.walt.signatory.rest.SignatoryRestAPI
 import id.walt.vclib.vclist.VerifiableId
 
 
 fun main() {
     // Load Walt.ID SSI-Kit services from "$workingDirectory/service-matrix.properties"
     ServiceMatrix("service-matrix.properties")
-
 
     // Register custom data provider
     DataProviderRegistry.register(VerifiableId::class, CustomIdDataProvider())

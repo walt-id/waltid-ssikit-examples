@@ -21,12 +21,10 @@ gradle-app.setting
 gradle.properties
 
 # WaltID SSI-Kit
-keys/
+data/
+credential-store/
 *.db
-/docs/essif/*
 *.log
-data
-
-
 secret_maven_username.txt
 secret_maven_password.txt
+
