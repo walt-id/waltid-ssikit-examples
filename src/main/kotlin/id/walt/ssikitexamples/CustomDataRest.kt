@@ -4,8 +4,14 @@ import id.walt.auditor.AuditorRestAPI
 import id.walt.auditor.PolicyRegistry
 import id.walt.servicematrix.ServiceMatrix
 import id.walt.signatory.DataProviderRegistry
+import id.walt.signatory.ProofConfig
+import id.walt.signatory.SignatoryDataProvider
+import id.walt.signatory.dateFormat
 import id.walt.signatory.rest.SignatoryRestAPI
+import id.walt.vclib.VcLibManager
+import id.walt.vclib.model.VerifiableCredential
 import id.walt.vclib.vclist.VerifiableId
+import java.util.*
 
 
 fun main() {
@@ -13,12 +19,13 @@ fun main() {
     ServiceMatrix("service-matrix.properties")
 
     // Register custom data provider
-    DataProviderRegistry.register(VerifiableId::class, CustomIdDataProvider())
+    DataProviderRegistry.register(CustomCredential::class, CustomIdDataProvider())
 
     // Registering custom verification policy
     PolicyRegistry.register(MyCustomPolicy())
 
-    // TODO: Registering a custom Credential Template
+    // Registering a custom Credential Template
+    VcLibManager.register(CustomCredential.Companion, CustomCredential::class)
 
     // Starting REST Services
     val bindAddress = "127.0.0.1"
@@ -47,3 +54,4 @@ fun main() {
 //    println("JSON verification result: ${resJson.overallStatus}")
 //    println("JWT verification result: ${resJwt.overallStatus}")
 }
+

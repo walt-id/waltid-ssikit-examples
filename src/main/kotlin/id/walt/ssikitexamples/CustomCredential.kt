@@ -1,6 +1,7 @@
 package id.walt.ssikitexamples
 
 import com.beust.klaxon.Json
+import id.walt.common.prettyPrint
 import id.walt.vclib.Helpers.encode
 import id.walt.vclib.Helpers.toCredential
 import id.walt.vclib.VcLibManager
@@ -10,23 +11,23 @@ import id.walt.vclib.registry.VerifiableCredentialMetadata
 import id.walt.vclib.vclist.Europass
 
 fun checkIfVendor(decodedCredential: VerifiableCredential): List<Any> = when (decodedCredential) {
-    is DataDaoCredential -> {
-        val subject: DataDaoCredential.DataDaoCredentialSubject = decodedCredential.credentialSubject!!
+    is CustomCredential -> {
+        val subject: CustomCredential.CustomCredentialSubject = decodedCredential.credentialSubject!!
 
         listOf(subject.givenName!!, subject.type!!.contains("Vendor"))
     }
-    is Europass -> throw Error("Europass isn't supported, please supply an DataDaoCredential/XYZMarketCredential/...")
+    is Europass -> throw Error("Europass isn't supported, please supply an CustomCredential/XYZMarketCredential/...")
     else -> throw Error("Invalid credential was supplied!")
 }
 
 
 fun main() {
     // Registering credential
-    VcLibManager.register(DataDaoCredential.Companion, DataDaoCredential::class)
+    VcLibManager.register(CustomCredential.Companion, CustomCredential::class)
 
     // Creating custom credential
-    val myCustomCredential = DataDaoCredential(
-        credentialSubject = DataDaoCredential.DataDaoCredentialSubject(
+    val myCustomCredential = CustomCredential(
+        credentialSubject = CustomCredential.CustomCredentialSubject(
             id = "did:example:123",
             type = listOf(
                 "Vendor",
@@ -45,13 +46,17 @@ fun main() {
         )
     )
 
-    // Encoding a custom credential to JSON
-    val customCredentialJson = myCustomCredential.encode()
     println("This is my custom credential: $myCustomCredential")
 
+    // Encoding a custom credential to JSON
+    val ecodedCredential = myCustomCredential.encode()
+    println("Encoding credential ...")
+    println(ecodedCredential.prettyPrint())
+
     // Decoding a JSON credential
-    println("Decoding json...")
-    val decodedCredential: VerifiableCredential = customCredentialJson.toCredential()
+    println("Decoding credential ...")
+    val decodedCredential: VerifiableCredential = ecodedCredential.toCredential()
+    println(decodedCredential)
 
     // Check if Mister John is a Vendor
     val (givenName, isVendor) = checkIfVendor(decodedCredential)
@@ -72,14 +77,14 @@ fun main() {
 }
 
 // This is our custom credential
-data class DataDaoCredential(
+data class CustomCredential(
     @Json(name = "@context")
     var context: List<String> = listOf("https://www.w3.org/2018/credentials/v1"),
-    @Json(serializeNull = false) var credentialSubject: DataDaoCredentialSubject? = null,
+    @Json(serializeNull = false) var credentialSubject: CustomCredentialSubject? = null,
     @Json(serializeNull = false) var issuer: String? = null,
     @Json(serializeNull = false) var proof: Proof?,
 ) : VerifiableCredential(type) {
-    data class DataDaoCredentialSubject(
+    data class CustomCredentialSubject(
         @Json(serializeNull = false) var id: String? = null, // did:ebsi:00000004321
         @Json(serializeNull = false) var type: List<String>? = null,
         @Json(serializeNull = false) var givenName: String? = null, // JOHN
@@ -87,10 +92,10 @@ data class DataDaoCredential(
     )
 
     companion object : VerifiableCredentialMetadata(
-        type = listOf("VerifiableCredential", "DataDaoCredential"),
+        type = listOf("VerifiableCredential", "CustomCredential"),
         template = {
-            DataDaoCredential(
-                credentialSubject = DataDaoCredentialSubject(
+            CustomCredential(
+                credentialSubject = CustomCredentialSubject(
                     id = "did:example:123",
                     type = listOf(
                         "Vendor",
