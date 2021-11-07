@@ -50,7 +50,7 @@ fun main() {
     val signedVC = credentialService.sign(Klaxon().toJsonString(vcTemplate), ProofConfig(issuerDid = issuerDid))
 
     // verify credential
-    val verificationResult = Auditor.verify(signedVC, listOf(SignaturePolicy(), JsonSchemaPolicy()))
+    val verificationResult = Auditor.getService().verify(signedVC, listOf(SignaturePolicy(), JsonSchemaPolicy()))
     println("VC verified: ${verificationResult.overallStatus}")
     verificationResult.policyResults.forEach { (policy, result) -> println("${policy}: $result") }
 
@@ -63,7 +63,7 @@ fun main() {
     )
 
     // verify presentation
-    val verificationResultVp = Auditor.verify(vp, listOf(SignaturePolicy(), JsonSchemaPolicy()))
+    val verificationResultVp = Auditor.getService().verify(vp, listOf(SignaturePolicy(), JsonSchemaPolicy()))
     println("VP verified: ${verificationResultVp.overallStatus}")
     verificationResultVp.policyResults.forEach { (policy, result) -> println("${policy}: $result") }
 }

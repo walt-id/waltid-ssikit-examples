@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     // Walt.ID
-    implementation("id.walt:waltid-ssi-kit:1.0-SNAPSHOT")
+    implementation("id.walt:waltid-ssi-kit:1.0.0")
     implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.0.1")
     implementation("id.walt:waltid-ssikit-vclib:1.4.9")
 

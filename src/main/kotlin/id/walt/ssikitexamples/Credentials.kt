@@ -29,8 +29,8 @@ fun main() {
     val vpJwt = Custodian.getService().createPresentation(listOf(vcJwt), holderDid)
 
     // Verify VPs, using Signature, JsonSchema and a custom policy
-    val resJson = Auditor.verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy()))
-    val resJwt = Auditor.verify(vpJwt, listOf(SignaturePolicy(), JsonSchemaPolicy()))
+    val resJson = Auditor.getService().verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy()))
+    val resJwt = Auditor.getService().verify(vpJwt, listOf(SignaturePolicy(), JsonSchemaPolicy()))
 
     println("JSON verification result: ${resJson.overallStatus}")
     println("JWT verification result: ${resJwt.overallStatus}")

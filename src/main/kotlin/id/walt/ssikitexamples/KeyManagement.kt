@@ -40,7 +40,7 @@ fun main() {
     keyService.delete(keyId.id)
 
     // Importing key
-    keyService.import(exportedPrivKey)
+    keyService.importKey(exportedPrivKey)
 
 
     val keyHandle3 = keyService.load(keyId.id)

@@ -68,8 +68,8 @@ fun main() {
     println(vpJwt)
 
     // Verify VPs, using Signature, JsonSchema and a custom policy
-    val resJson = Auditor.verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
-    val resJwt = Auditor.verify(vpJwt, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
+    val resJson = Auditor.getService().verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
+    val resJwt = Auditor.getService().verify(vpJwt, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
 
     println("JSON verification result: ${resJson.overallStatus}")
     println("JWT verification result: ${resJwt.overallStatus}")
