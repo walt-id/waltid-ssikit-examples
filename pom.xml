@@ -101,7 +101,7 @@
         <dependency>
             <groupId>id.walt</groupId>
             <artifactId>waltid-ssi-kit</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>1.3.0</version>
         </dependency>
 
         <dependency>
@@ -113,7 +113,7 @@
         <dependency>
             <groupId>id.walt</groupId>
             <artifactId>waltid-ssikit-vclib</artifactId>
-            <version>1.4.9</version>
+            <version>1.6.3</version>
         </dependency>
 
         <!-- JSON -->
@@ -128,29 +128,6 @@
             <groupId>io.github.microutils</groupId>
             <artifactId>kotlin-logging-jvm</artifactId>
             <version>2.0.6</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.0-alpha1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <version>2.14.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
-            <version>2.14.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j18-impl</artifactId>
-            <version>2.14.1</version>
         </dependency>
 
         <!-- Kotlin -->

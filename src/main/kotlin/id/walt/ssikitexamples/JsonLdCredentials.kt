@@ -12,7 +12,7 @@ import id.walt.services.key.KeyService
 import id.walt.services.vc.JsonLdCredentialService
 import id.walt.signatory.ProofConfig
 import id.walt.signatory.Signatory
-import id.walt.vclib.vclist.VerifiableAttestation
+import id.walt.vclib.credentials.VerifiableAttestation
 
 fun main() {
     // Load Walt.ID SSI-Kit services from "$workingDirectory/service-matrix.properties"
@@ -51,7 +51,7 @@ fun main() {
 
     // verify credential
     val verificationResult = Auditor.getService().verify(signedVC, listOf(SignaturePolicy(), JsonSchemaPolicy()))
-    println("VC verified: ${verificationResult.overallStatus}")
+    println("VC verified: ${verificationResult.valid}")
     verificationResult.policyResults.forEach { (policy, result) -> println("${policy}: $result") }
 
     // present credential
@@ -64,6 +64,6 @@ fun main() {
 
     // verify presentation
     val verificationResultVp = Auditor.getService().verify(vp, listOf(SignaturePolicy(), JsonSchemaPolicy()))
-    println("VP verified: ${verificationResultVp.overallStatus}")
+    println("VP verified: ${verificationResultVp.valid}")
     verificationResultVp.policyResults.forEach { (policy, result) -> println("${policy}: $result") }
 }

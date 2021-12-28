@@ -10,7 +10,7 @@ import id.walt.signatory.dateFormat
 import id.walt.signatory.rest.SignatoryRestAPI
 import id.walt.vclib.VcLibManager
 import id.walt.vclib.model.VerifiableCredential
-import id.walt.vclib.vclist.VerifiableId
+import id.walt.vclib.credentials.VerifiableId
 import java.util.*
 
 

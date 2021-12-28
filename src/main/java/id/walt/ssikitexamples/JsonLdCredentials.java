@@ -10,7 +10,8 @@ import id.walt.services.vc.JsonLdCredentialService;
 import id.walt.signatory.ProofConfig;
 import id.walt.signatory.ProofType;
 import id.walt.signatory.Signatory;
-import id.walt.vclib.vclist.VerifiableAttestation;
+import id.walt.vclib.credentials.VerifiableAttestation;
+
 
 import java.util.List;
 
@@ -33,8 +34,8 @@ public class JsonLdCredentials {
         var issuerKey = keyService.generate(KeyAlgorithm.EdDSA_Ed25519);
 
         // create dids, using did:key
-        var holderDid = DidService.INSTANCE.create(DidMethod.key, holderKey.getId());
-        String issuerDid = DidService.INSTANCE.create(DidMethod.key, issuerKey.getId());
+        var holderDid = DidService.INSTANCE.create(DidMethod.key, holderKey.getId(), null);
+        String issuerDid = DidService.INSTANCE.create(DidMethod.key, issuerKey.getId(), null);
 
         // issue verifiable credential
 
@@ -42,7 +43,7 @@ public class JsonLdCredentials {
         signatory.listTemplates().forEach(templateName -> System.out.println(templateName));
 
         // Prepare VC template
-        var vcTemplate = new VerifiableAttestation(List.of("https://www.w3.org/2018/credentials/v1"), "VerifiableAttestation", issuerDid, null, null, null, null, null, null, null);
+        var vcTemplate = new VerifiableAttestation(List.of("https://www.w3.org/2018/credentials/v1"), "VerifiableAttestation", issuerDid, null, null, null, null, null, null, null, null);
         vcTemplate.setCredentialSubject(new VerifiableAttestation.CredentialSubject(holderDid));
 
         var credentialJson = new Klaxon().toJsonString(vcTemplate, null);

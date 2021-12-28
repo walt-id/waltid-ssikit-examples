@@ -11,8 +11,8 @@ import id.walt.signatory.ProofConfig
 import id.walt.signatory.ProofType
 import id.walt.signatory.Signatory
 import id.walt.vclib.model.VerifiableCredential
-import id.walt.vclib.vclist.VerifiableId
-import id.walt.vclib.vclist.VerifiablePresentation
+import id.walt.vclib.credentials.VerifiableId
+import id.walt.vclib.credentials.VerifiablePresentation
 
 class MyCustomPolicy : VerificationPolicy {
     override val description: String
@@ -71,6 +71,6 @@ fun main() {
     val resJson = Auditor.getService().verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
     val resJwt = Auditor.getService().verify(vpJwt, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
 
-    println("JSON verification result: ${resJson.overallStatus}")
-    println("JWT verification result: ${resJwt.overallStatus}")
+    println("JSON verification result: ${resJson.valid}")
+    println("JWT verification result: ${resJwt.valid}")
 }

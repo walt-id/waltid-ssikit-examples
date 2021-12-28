@@ -32,6 +32,6 @@ fun main() {
     val resJson = Auditor.getService().verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy()))
     val resJwt = Auditor.getService().verify(vpJwt, listOf(SignaturePolicy(), JsonSchemaPolicy()))
 
-    println("JSON verification result: ${resJson.overallStatus}")
-    println("JWT verification result: ${resJwt.overallStatus}")
+    println("JSON verification result: ${resJson.valid}")
+    println("JWT verification result: ${resJwt.valid}")
 }

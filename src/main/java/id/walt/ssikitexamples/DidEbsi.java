@@ -38,7 +38,7 @@ public class DidEbsi {
         // Create an EBSI compliant Decentralized Identifier
         ///////////////////////////////////////////////////////////////////////////
 
-        var didEbsi = DidService.INSTANCE.create(DidMethod.ebsi, keyId.getId()); // Note, that the DID is stored in /data/did/create
+        var didEbsi = DidService.INSTANCE.create(DidMethod.ebsi, keyId.getId(), null); // Note, that the DID is stored in /data/did/create
 
         System.out.println("EBSI DID created : " + didEbsi);
 

@@ -5,10 +5,11 @@ import id.walt.common.prettyPrint
 import id.walt.vclib.Helpers.encode
 import id.walt.vclib.Helpers.toCredential
 import id.walt.vclib.VcLibManager
+import id.walt.vclib.credentials.Europass
 import id.walt.vclib.model.Proof
 import id.walt.vclib.model.VerifiableCredential
 import id.walt.vclib.registry.VerifiableCredentialMetadata
-import id.walt.vclib.vclist.Europass
+
 
 fun checkIfVendor(decodedCredential: VerifiableCredential): List<Any> = when (decodedCredential) {
     is CustomCredential -> {
