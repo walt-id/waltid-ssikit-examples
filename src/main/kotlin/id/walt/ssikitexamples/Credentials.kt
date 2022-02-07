@@ -25,8 +25,8 @@ fun main() {
         .issue("VerifiableId", ProofConfig(issuerDid = issuerDid, subjectDid = holderDid, proofType = ProofType.JWT))
 
     // Present VC in JSON-LD and JWT format (for show-casing both formats)
-    val vpJson = Custodian.getService().createPresentation(listOf(vcJson), holderDid)
-    val vpJwt = Custodian.getService().createPresentation(listOf(vcJwt), holderDid)
+    val vpJson = Custodian.getService().createPresentation(listOf(vcJson), holderDid, null, null, null, null)
+    val vpJwt = Custodian.getService().createPresentation(listOf(vcJwt), holderDid, null, null, null, null)
 
     // Verify VPs, using Signature, JsonSchema and a custom policy
     val resJson = Auditor.getService().verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy()))

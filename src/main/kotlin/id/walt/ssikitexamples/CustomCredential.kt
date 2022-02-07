@@ -2,12 +2,10 @@ package id.walt.ssikitexamples
 
 import com.beust.klaxon.Json
 import id.walt.common.prettyPrint
-import id.walt.vclib.Helpers.encode
-import id.walt.vclib.Helpers.toCredential
-import id.walt.vclib.VcLibManager
+import id.walt.ssikitexamples.CustomCredential.CustomCredentialSubject
 import id.walt.vclib.credentials.Europass
-import id.walt.vclib.model.Proof
-import id.walt.vclib.model.VerifiableCredential
+import id.walt.vclib.model.*
+import id.walt.vclib.registry.VcTypeRegistry
 import id.walt.vclib.registry.VerifiableCredentialMetadata
 
 
@@ -24,7 +22,7 @@ fun checkIfVendor(decodedCredential: VerifiableCredential): List<Any> = when (de
 
 fun main() {
     // Registering credential
-    VcLibManager.register(CustomCredential.Companion, CustomCredential::class)
+    VcTypeRegistry.register(CustomCredential.Companion, CustomCredential::class)
 
     // Creating custom credential
     val myCustomCredential = CustomCredential(
@@ -81,16 +79,21 @@ fun main() {
 data class CustomCredential(
     @Json(name = "@context")
     var context: List<String> = listOf("https://www.w3.org/2018/credentials/v1"),
-    @Json(serializeNull = false) var credentialSubject: CustomCredentialSubject? = null,
-    @Json(serializeNull = false) var issuer: String? = null,
-    @Json(serializeNull = false) var proof: Proof?,
-) : VerifiableCredential(type) {
+    override var id: String? = null,
+    override var issuer: String?,
+    @Json(serializeNull = false) override var issuanceDate: String? = null,
+    @Json(serializeNull = false) override var validFrom: String? = null,
+    @Json(serializeNull = false) override var expirationDate: String? = null,
+    @Json(serializeNull = false) override var credentialSubject: CustomCredentialSubject?,
+    @Json(serializeNull = false) override var credentialSchema: CredentialSchema? = null,
+    @Json(serializeNull = false) override var proof: Proof? = null,
+) : AbstractVerifiableCredential<CustomCredentialSubject>(type) {
     data class CustomCredentialSubject(
-        @Json(serializeNull = false) var id: String? = null, // did:ebsi:00000004321
+        @Json(serializeNull = false) override var id: String? = null, // did:ebsi:00000004321
         @Json(serializeNull = false) var type: List<String>? = null,
         @Json(serializeNull = false) var givenName: String? = null, // JOHN
         @Json(serializeNull = false) var birthDate: String? = null // 1958-08-17
-    )
+    ) : CredentialSubject()
 
     companion object : VerifiableCredentialMetadata(
         type = listOf("VerifiableCredential", "CustomCredential"),
@@ -117,6 +120,4 @@ data class CustomCredential(
         }
     )
 
-    @Json(serializeNull = false)
-    override var id: String? = null
 }

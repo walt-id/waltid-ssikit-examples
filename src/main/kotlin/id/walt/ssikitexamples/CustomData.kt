@@ -14,11 +14,11 @@ import id.walt.vclib.model.VerifiableCredential
 import id.walt.vclib.credentials.VerifiableId
 import id.walt.vclib.credentials.VerifiablePresentation
 
-class MyCustomPolicy : VerificationPolicy {
+class MyCustomPolicy : VerificationPolicy() {
     override val description: String
         get() = "A custom verification policy"
 
-    override fun verify(vc: VerifiableCredential): Boolean {
+    override fun doVerify(vc: VerifiableCredential): Boolean {
         if (vc is VerifiableId) {
             val idData = MockedIdDatabase.get(vc.credentialSubject!!.personalIdentifier!!)
             if (idData != null) {
@@ -60,10 +60,10 @@ fun main() {
     println(vcJwt)
 
     // Present VC in JSON-LD and JWT format (for show-casing both formats)
-    val vpJson = custodian.createPresentation(listOf(vcJsonLd), holder.did)
+    val vpJson = custodian.createPresentation(listOf(vcJsonLd), holder.did, null, null, null, null)
     println("------------------------------- VP in JSON_LD format -------------------------------")
     println(vpJson)
-    val vpJwt = custodian.createPresentation(listOf(vcJwt), holder.did)
+    val vpJwt = custodian.createPresentation(listOf(vcJwt), holder.did, null, null, null, null)
     println("\n------------------------------- VP in JWT format -------------------------------")
     println(vpJwt)
 

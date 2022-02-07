@@ -6,11 +6,9 @@ import id.walt.servicematrix.ServiceMatrix
 import id.walt.signatory.DataProviderRegistry
 import id.walt.signatory.ProofConfig
 import id.walt.signatory.SignatoryDataProvider
-import id.walt.signatory.dateFormat
 import id.walt.signatory.rest.SignatoryRestAPI
-import id.walt.vclib.VcLibManager
 import id.walt.vclib.model.VerifiableCredential
-import id.walt.vclib.credentials.VerifiableId
+import id.walt.vclib.registry.VcTypeRegistry
 import java.util.*
 
 
@@ -25,7 +23,7 @@ fun main() {
     PolicyRegistry.register(MyCustomPolicy())
 
     // Registering a custom Credential Template
-    VcLibManager.register(CustomCredential.Companion, CustomCredential::class)
+    VcTypeRegistry.register(CustomCredential.Companion, CustomCredential::class)
 
     // Starting REST Services
     val bindAddress = "127.0.0.1"

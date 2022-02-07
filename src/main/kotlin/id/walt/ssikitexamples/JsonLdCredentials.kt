@@ -45,7 +45,7 @@ fun main() {
         listOf("https://www.w3.org/2018/credentials/v1"),
         "VerifiableAttestation",
         issuerDid,
-        credentialSubject = VerifiableAttestation.CredentialSubject(holderDid)
+        credentialSubject = VerifiableAttestation.VerifiableAttestationSubject(holderDid)
     )
     val signedVC = credentialService.sign(Klaxon().toJsonString(vcTemplate), ProofConfig(issuerDid = issuerDid))
 
@@ -59,7 +59,8 @@ fun main() {
         listOf(signedVC),
         holderDid,
         "https://api.preprod.ebsi.eu",
-        "d04442d3-661f-411e-a80f-42f19f594c9d"
+        "d04442d3-661f-411e-a80f-42f19f594c9d",
+        null
     )
 
     // verify presentation
