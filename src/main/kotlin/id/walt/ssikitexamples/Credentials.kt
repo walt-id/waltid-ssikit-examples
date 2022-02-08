@@ -10,6 +10,8 @@ import id.walt.services.did.DidService
 import id.walt.signatory.ProofConfig
 import id.walt.signatory.ProofType
 import id.walt.signatory.Signatory
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 fun main() {
     // Load Walt.ID SSI-Kit services from "$workingDirectory/service-matrix.properties"
@@ -25,8 +27,9 @@ fun main() {
         .issue("VerifiableId", ProofConfig(issuerDid = issuerDid, subjectDid = holderDid, proofType = ProofType.JWT))
 
     // Present VC in JSON-LD and JWT format (for show-casing both formats)
-    val vpJson = Custodian.getService().createPresentation(listOf(vcJson), holderDid)
-    val vpJwt = Custodian.getService().createPresentation(listOf(vcJwt), holderDid)
+    val expiration = Instant.now().plus(30, ChronoUnit.DAYS)
+    val vpJson = Custodian.getService().createPresentation(listOf(vcJson), holderDid, expirationDate = expiration)
+    val vpJwt = Custodian.getService().createPresentation(listOf(vcJwt), holderDid, expirationDate = expiration)
 
     // Verify VPs, using Signature, JsonSchema and a custom policy
     val resJson = Auditor.getService().verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy()))

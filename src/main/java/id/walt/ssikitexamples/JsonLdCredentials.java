@@ -44,7 +44,7 @@ public class JsonLdCredentials {
 
         // Prepare VC template
         var vcTemplate = new VerifiableAttestation(List.of("https://www.w3.org/2018/credentials/v1"), "VerifiableAttestation", issuerDid, null, null, null, null, null, null, null, null);
-        vcTemplate.setCredentialSubject(new VerifiableAttestation.CredentialSubject(holderDid));
+        vcTemplate.setCredentialSubject(new VerifiableAttestation.VerifiableAttestationSubject(holderDid));
 
         var credentialJson = new Klaxon().toJsonString(vcTemplate, null);
         var proofConfig = new ProofConfig(issuerDid, holderDid, null, null, ProofType.LD_PROOF, null, null, null, null, null, null, null, null);
