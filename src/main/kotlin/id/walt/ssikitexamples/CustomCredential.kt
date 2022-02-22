@@ -25,6 +25,7 @@ fun main() {
     VcTypeRegistry.register(CustomCredential.Companion, CustomCredential::class)
 
     // Creating custom credential
+    // the proof signature is only an example
     val myCustomCredential = CustomCredential(
         credentialSubject = CustomCredential.CustomCredentialSubject(
             id = "did:example:123",
