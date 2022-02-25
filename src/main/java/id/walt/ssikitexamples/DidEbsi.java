@@ -43,7 +43,7 @@ public class DidEbsi {
         System.out.println("EBSI DID created : " + didEbsi);
 
         var didDoc = DidService.INSTANCE.loadDidEbsi(didEbsi);
-        System.out.print("\nDID EBSI Document loaded:\n" + didDoc);
+        System.out.print("\nDID EBSI Document loaded:\n" + didDoc.encodePretty());
 
         ///////////////////////////////////////////////////////////////////////////
         // Registering the DID on the ledger

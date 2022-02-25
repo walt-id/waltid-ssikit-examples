@@ -14,20 +14,21 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 fun main() {
-    // Load Walt.ID SSI-Kit services from "$workingDirectory/service-matrix.properties"
+    // Load walt.id SSI-Kit services from "$workingDirectory/service-matrix.properties"
     ServiceMatrix("service-matrix.properties")
 
     val issuerDid = DidService.create(DidMethod.ebsi)
     val holderDid = DidService.create(DidMethod.key)
 
     // Issue VC in JSON-LD and JWT format (for show-casing both formats)
+    val expiration = Instant.now().plus(30, ChronoUnit.DAYS)
     val vcJson = Signatory.getService()
-        .issue("VerifiableId", ProofConfig(issuerDid = issuerDid, subjectDid = holderDid, proofType = ProofType.LD_PROOF))
+        .issue("VerifiableId", ProofConfig(issuerDid = issuerDid, subjectDid = holderDid, proofType = ProofType.LD_PROOF, expirationDate = expiration))
+
     val vcJwt = Signatory.getService()
-        .issue("VerifiableId", ProofConfig(issuerDid = issuerDid, subjectDid = holderDid, proofType = ProofType.JWT))
+        .issue("VerifiableId", ProofConfig(issuerDid = issuerDid, subjectDid = holderDid, proofType = ProofType.JWT, expirationDate = expiration))
 
     // Present VC in JSON-LD and JWT format (for show-casing both formats)
-    val expiration = Instant.now().plus(30, ChronoUnit.DAYS)
     val vpJson = Custodian.getService().createPresentation(listOf(vcJson), holderDid, expirationDate = expiration)
     val vpJwt = Custodian.getService().createPresentation(listOf(vcJwt), holderDid, expirationDate = expiration)
 
