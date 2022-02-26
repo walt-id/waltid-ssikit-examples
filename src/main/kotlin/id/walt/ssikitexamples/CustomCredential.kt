@@ -7,17 +7,6 @@ import id.walt.vclib.model.*
 import id.walt.vclib.registry.VcTypeRegistry
 import id.walt.vclib.registry.VerifiableCredentialMetadata
 
-
-fun checkIfVendor(decodedCredential: VerifiableCredential): List<Any> = when (decodedCredential) {
-    is CustomCredential -> {
-        val subject: CustomCredential.CustomCredentialSubject = decodedCredential.credentialSubject!!
-
-        listOf(subject.givenName!!, subject.type!!.contains("Vendor"))
-    }
-    else -> throw Error("Invalid credential was supplied!")
-}
-
-
 fun main() {
     // Registering a custom credential template
     VcTypeRegistry.register(CustomCredential.Companion, CustomCredential::class)
@@ -105,3 +94,13 @@ data class CustomCredential(
         }
     )
 }
+
+fun checkIfVendor(decodedCredential: VerifiableCredential): List<Any> = when (decodedCredential) {
+    is CustomCredential -> {
+        val subject: CustomCredential.CustomCredentialSubject = decodedCredential.credentialSubject!!
+
+        listOf(subject.givenName!!, subject.type!!.contains("Vendor"))
+    }
+    else -> throw Error("Invalid credential was supplied!")
+}
+

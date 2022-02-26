@@ -1,36 +1,19 @@
 package id.walt.ssikitexamples
 
+import com.beust.klaxon.Json
 import id.walt.auditor.Auditor
 import id.walt.auditor.JsonSchemaPolicy
 import id.walt.auditor.SignaturePolicy
 import id.walt.auditor.VerificationPolicy
 import id.walt.custodian.Custodian
 import id.walt.servicematrix.ServiceMatrix
-import id.walt.signatory.DataProviderRegistry
-import id.walt.signatory.ProofConfig
-import id.walt.signatory.ProofType
-import id.walt.signatory.Signatory
+import id.walt.signatory.*
 import id.walt.vclib.model.VerifiableCredential
 import id.walt.vclib.credentials.VerifiableId
 import id.walt.vclib.credentials.VerifiablePresentation
-
-class MyCustomPolicy : VerificationPolicy() {
-    override val description: String
-        get() = "A custom verification policy"
-
-    override fun doVerify(vc: VerifiableCredential): Boolean {
-        if (vc is VerifiableId) {
-            val idData = MockedIdDatabase.get(vc.credentialSubject!!.personalIdentifier!!)
-            if (idData != null) {
-                return idData.familyName == vc.credentialSubject?.familyName && idData.firstName == vc.credentialSubject?.firstName
-            }
-        } else if (vc is VerifiablePresentation) {
-            // This custom policy does not verify the VerifiablePresentation
-            return true
-        }
-        return false
-    }
-}
+import id.walt.vclib.schema.SchemaService
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 val signatory = Signatory.getService()
 val custodian = Custodian.getService()
@@ -73,4 +56,61 @@ fun main() {
 
     println("JSON verification result: ${resJson.valid}")
     println("JWT verification result: ${resJwt.valid}")
+}
+
+
+// Custom Policy
+class MyCustomPolicy : VerificationPolicy() {
+    override val description: String
+        get() = "A custom verification policy"
+
+    override fun doVerify(vc: VerifiableCredential): Boolean {
+        if (vc is VerifiableId) {
+            val idData = MockedIdDatabase.get(vc.credentialSubject!!.personalIdentifier!!)
+            if (idData != null) {
+                return idData.familyName == vc.credentialSubject?.familyName && idData.firstName == vc.credentialSubject?.firstName
+            }
+        } else if (vc is VerifiablePresentation) {
+            // This custom policy does not verify the VerifiablePresentation
+            return true
+        }
+        return false
+    }
+}
+
+// Custom Data Provider
+class CustomIdDataProvider : SignatoryDataProvider {
+
+    @field:SchemaService.JsonIgnore
+    @Json(ignored = true)
+    open val dateFormat = DateTimeFormatter.ISO_INSTANT
+
+    override fun populate(template: VerifiableCredential, proofConfig: ProofConfig): VerifiableCredential {
+        if (template is VerifiableId) {
+            // get ID data for the given subject
+            val idData = MockedIdDatabase.get(proofConfig.dataProviderIdentifier!!) ?: throw Exception("No ID data found for the given data-povider identifier")
+
+            template.id = "identity#verifiableID#${UUID.randomUUID()}"
+            template.issuer = proofConfig.issuerDid
+            if (proofConfig.issueDate != null) template.issuanceDate = dateFormat.format(proofConfig.issueDate)
+            if (proofConfig.expirationDate != null) template.expirationDate = dateFormat.format(proofConfig.expirationDate)
+            template.validFrom = template.issuanceDate
+            template.evidence!!.verifier = proofConfig.issuerDid
+            template.credentialSubject = VerifiableId.VerifiableIdSubject(
+                idData.did,
+                null,
+                idData.familyName,
+                idData.firstName,
+                idData.dateOfBirth,
+                idData.personalIdentifier,
+                idData.nameAndFamilyNameAtBirth,
+                idData.placeOfBirth,
+                idData.currentAddress,
+                idData.gender
+            )
+            return template
+        } else {
+            throw IllegalArgumentException("Only VerifiableId is supported by this data provider")
+        }
+    }
 }
