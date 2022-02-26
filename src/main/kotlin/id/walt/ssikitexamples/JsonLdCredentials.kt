@@ -15,7 +15,7 @@ import id.walt.signatory.Signatory
 import id.walt.vclib.credentials.VerifiableAttestation
 
 fun main() {
-    // Load Walt.ID SSI-Kit services from "$workingDirectory/service-matrix.properties"
+    // Load walt.id SSI-Kit services from "$workingDirectory/service-matrix.properties"
     ServiceMatrix("service-matrix.properties")
 
     // Define used services

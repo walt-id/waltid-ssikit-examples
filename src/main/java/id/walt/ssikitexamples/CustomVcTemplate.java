@@ -22,7 +22,7 @@ public class CustomVcTemplate {
     }
 
     public void run() {
-        // Load Walt.ID SSI-Kit services from "$workingDirectory/service-matrix.properties"
+        // Load walt.id SSI-Kit services from "$workingDirectory/service-matrix.properties"
         new ServiceMatrix("service-matrix.properties");
 
         // Define used services

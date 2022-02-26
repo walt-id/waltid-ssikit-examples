@@ -36,7 +36,7 @@ val signatory = Signatory.getService()
 val custodian = Custodian.getService()
 
 fun main() {
-    // Load Walt.ID SSI-Kit services from "$workingDirectory/service-matrix.properties"
+    // Load walt.id SSI-Kit services from "$workingDirectory/service-matrix.properties"
     ServiceMatrix("service-matrix.properties")
 
     // Create VCs to verify:
@@ -47,7 +47,7 @@ fun main() {
     // Register custom data provider
     DataProviderRegistry.register(VerifiableId::class, CustomIdDataProvider())
 
-    // Issue VC in JSON-LD and JWT format (for show-casing both formats)
+    // Issue VC in JSON-LD and JWT format
     val vcJsonLd = signatory.issue(
         "VerifiableId",
         ProofConfig(issuerDid = issuer.did, subjectDid = holder.did, proofType = ProofType.LD_PROOF, dataProviderIdentifier = holder.personalIdentifier)
@@ -59,7 +59,7 @@ fun main() {
     println("\n------------------------------- VC in JWT format -------------------------------")
     println(vcJwt)
 
-    // Present VC in JSON-LD and JWT format (for show-casing both formats)
+    // Present VC in JSON-LD and JWT format
     val vpJson = custodian.createPresentation(listOf(vcJsonLd), holder.did, null, null, null, null)
     println("------------------------------- VP in JSON_LD format -------------------------------")
     println(vpJson)

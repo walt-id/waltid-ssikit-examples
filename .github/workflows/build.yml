@@ -1,4 +1,4 @@
-name: CI/CD Workflow for Walt.ID SSI-Kit Examples
+name: CI/CD Workflow for walt.id SSI-Kit Examples
 
 on:
   push:

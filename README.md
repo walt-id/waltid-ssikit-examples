@@ -1,4 +1,4 @@
-# Walt.ID SSI-Kit example project
+# walt.id SSI-Kit example project
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=walt-id_waltid-ssikit-examples&metric=security_rating)](https://sonarcloud.io/dashboard?id=walt-id_waltid-ssikit-examples)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=walt-id_waltid-ssikit-examples&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=walt-id_waltid-ssikit-examples)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=walt-id_waltid-ssikit-examples&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=walt-id_waltid-ssikit-examples)
@@ -14,7 +14,7 @@
 [comment]: <> ([![Quality Gate Status]&#40;https://sonarcloud.io/api/project_badges/measure?project=walt-id_waltid-ssikit-examples&metric=alert_status&#41;]&#40;https://sonarcloud.io/dashboard?id=walt-id_waltid-ssikit-examples&#41;)
 
 
-This repository demonstrates several usage examples of the Walt.ID SSI-Kit project.
+This repository demonstrates several usage examples of the walt.id SSI-Kit project.
 
 ### Setup
 
