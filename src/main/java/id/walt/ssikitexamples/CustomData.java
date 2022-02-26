@@ -15,14 +15,14 @@ import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
 import java.util.Map;
 
-public class CustomVcTemplate {
+public class CustomData {
 
     public static void main(String[] args) {
-        new CustomVcTemplate().run();
+        new CustomData().run();
     }
 
     public void run() {
-        // Load Walt.ID SSI-Kit services from "$workingDirectory/service-matrix.properties"
+        // Load walt.id SSI-Kit services from "$workingDirectory/service-matrix.properties"
         new ServiceMatrix("service-matrix.properties");
 
         // Define used services
@@ -45,8 +45,8 @@ public class CustomVcTemplate {
         });
 
         // Create VC template
-        var defaultVerifiableDiploma = VcTemplateManager.INSTANCE.loadTemplate("VerifiableDiploma");
-        System.out.println("Default Verifiable Diploma - " + defaultVerifiableDiploma.encodePretty());
+        var verifiableDiplomaTemplate = VcTemplateManager.INSTANCE.loadTemplate("VerifiableDiploma");
+        System.out.println("Default Verifiable Diploma - " + verifiableDiplomaTemplate.encodePretty());
 
         // Prepare desired custom data that should replace the default template data
         var data = Map.ofEntries(
@@ -54,11 +54,11 @@ public class CustomVcTemplate {
         );
 
         // Custom VC template
-        var customVerifiableDiploma = new MergingDataProvider(data).populate(
-                defaultVerifiableDiploma,
+        var verifiableDiploma = new MergingDataProvider(data).populate(
+                verifiableDiplomaTemplate,
                 new ProofConfig(issuerDid, holderDid, null, null, ProofType.LD_PROOF, null, null, null, null, null, null, null, null)
         );
-        System.out.println("Custom Verifiable Diploma - " + customVerifiableDiploma.encodePretty());
+        System.out.println("Verifiable Diploma with custom data - " + verifiableDiploma.encodePretty());
 
     }
 

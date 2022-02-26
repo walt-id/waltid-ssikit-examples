@@ -1,76 +1,61 @@
 package id.walt.ssikitexamples
 
-import id.walt.auditor.Auditor
-import id.walt.auditor.JsonSchemaPolicy
-import id.walt.auditor.SignaturePolicy
-import id.walt.auditor.VerificationPolicy
-import id.walt.custodian.Custodian
+import id.walt.common.prettyPrint
+import id.walt.crypto.KeyAlgorithm
+import id.walt.model.DidMethod
 import id.walt.servicematrix.ServiceMatrix
-import id.walt.signatory.DataProviderRegistry
+import id.walt.services.did.DidService
+import id.walt.services.key.KeyService
 import id.walt.signatory.ProofConfig
 import id.walt.signatory.ProofType
 import id.walt.signatory.Signatory
-import id.walt.vclib.model.VerifiableCredential
-import id.walt.vclib.credentials.VerifiableId
-import id.walt.vclib.credentials.VerifiablePresentation
-
-class MyCustomPolicy : VerificationPolicy() {
-    override val description: String
-        get() = "A custom verification policy"
-
-    override fun doVerify(vc: VerifiableCredential): Boolean {
-        if (vc is VerifiableId) {
-            val idData = MockedIdDatabase.get(vc.credentialSubject!!.personalIdentifier!!)
-            if (idData != null) {
-                return idData.familyName == vc.credentialSubject?.familyName && idData.firstName == vc.credentialSubject?.firstName
-            }
-        } else if (vc is VerifiablePresentation) {
-            // This custom policy does not verify the VerifiablePresentation
-            return true
-        }
-        return false
-    }
-}
-
-val signatory = Signatory.getService()
-val custodian = Custodian.getService()
+import id.walt.signatory.dataproviders.MergingDataProvider
+import id.walt.vclib.templates.VcTemplateManager
 
 fun main() {
-    // Load Walt.ID SSI-Kit services from "$workingDirectory/service-matrix.properties"
+    // Load walt.id SSI-Kit services from "$workingDirectory/service-matrix.properties"
     ServiceMatrix("service-matrix.properties")
 
-    // Create VCs to verify:
-    val idIter = MockedIdDatabase.mockedIds.values.iterator()
-    val holder = idIter.next()
-    val issuer = idIter.next()
+    // Define used services
+    val signatory = Signatory.getService()
+    val keyService = KeyService.getService()
 
-    // Register custom data provider
-    DataProviderRegistry.register(VerifiableId::class, CustomIdDataProvider())
+    /* Use services... */
+    // generate key pairs for holder, issuer
+    val holderKey = keyService.generate(KeyAlgorithm.RSA)
+    val issuerKey = keyService.generate(KeyAlgorithm.ECDSA_Secp256k1)
 
-    // Issue VC in JSON-LD and JWT format (for show-casing both formats)
-    val vcJsonLd = signatory.issue(
-        "VerifiableId",
-        ProofConfig(issuerDid = issuer.did, subjectDid = holder.did, proofType = ProofType.LD_PROOF, dataProviderIdentifier = holder.personalIdentifier)
+    // create dids, using did:key
+    val holderDid = DidService.create(DidMethod.key, holderKey.id)
+    val issuerDid = DidService.create(DidMethod.key, issuerKey.id)
+
+    // List registered VC templates
+    signatory.listTemplates().forEachIndexed { index, templateName ->
+        println("$index: $templateName")
+    }
+
+    // Load a VC template
+    val verifiableDiplomaTemplate = VcTemplateManager.loadTemplate("VerifiableDiploma")
+    println("Default Verifiable Diploma - " + verifiableDiplomaTemplate.prettyPrint())
+
+    // Prepare desired custom data that should replace the default template data
+    val data = mapOf(
+        credentialSubjectEntry(
+            Pair("givenNames", "Yves"),
+            Pair("familyName", "SMITH"),
+            Pair("dateOfBirth", "2000-02-04")
+        )
     )
-    println("\n------------------------------- VC in JSON_LD format -------------------------------")
-    println(vcJsonLd)
-    val vcJwt =
-        signatory.issue("VerifiableId", ProofConfig(issuerDid = issuer.did, subjectDid = holder.did, proofType = ProofType.JWT, dataProviderIdentifier = holder.personalIdentifier))
-    println("\n------------------------------- VC in JWT format -------------------------------")
-    println(vcJwt)
 
-    // Present VC in JSON-LD and JWT format (for show-casing both formats)
-    val vpJson = custodian.createPresentation(listOf(vcJsonLd), holder.did, null, null, null, null)
-    println("------------------------------- VP in JSON_LD format -------------------------------")
-    println(vpJson)
-    val vpJwt = custodian.createPresentation(listOf(vcJwt), holder.did, null, null, null, null)
-    println("\n------------------------------- VP in JWT format -------------------------------")
-    println(vpJwt)
+    // Populate VC template with custom data
+    val verifiableDiploma = MergingDataProvider(data).populate(
+        verifiableDiplomaTemplate,
+        ProofConfig(subjectDid = holderDid, issuerDid = issuerDid, proofType = ProofType.LD_PROOF)
+    )
+    println("Verifiable Diploma with custom data - " + verifiableDiploma.prettyPrint())
 
-    // Verify VPs, using Signature, JsonSchema and a custom policy
-    val resJson = Auditor.getService().verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
-    val resJwt = Auditor.getService().verify(vpJwt, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
+}
 
-    println("JSON verification result: ${resJson.valid}")
-    println("JWT verification result: ${resJwt.valid}")
+fun credentialSubjectEntry(vararg pairs: Pair<String, String>): Pair<String, Map<String, String>> {
+    return Pair("credentialSubject", pairs.toMap())
 }

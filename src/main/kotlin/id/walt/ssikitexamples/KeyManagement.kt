@@ -7,7 +7,7 @@ import id.walt.services.key.KeyService
 import id.walt.services.keystore.KeyType
 
 fun main() {
-    // Load Walt.ID SSI-Kit services from "$workingDirectory/service-matrix.properties"
+    // Load walt.id SSI-Kit services from "$workingDirectory/service-matrix.properties"
     ServiceMatrix("service-matrix.properties")
 
     // Define used services

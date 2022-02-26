@@ -1,4 +1,4 @@
-# Walt.ID SSI-Kit example project
+# walt.id SSI-Kit example project
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=walt-id_waltid-ssikit-examples&metric=security_rating)](https://sonarcloud.io/dashboard?id=walt-id_waltid-ssikit-examples)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=walt-id_waltid-ssikit-examples&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=walt-id_waltid-ssikit-examples)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=walt-id_waltid-ssikit-examples&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=walt-id_waltid-ssikit-examples)
@@ -14,7 +14,7 @@
 [comment]: <> ([![Quality Gate Status]&#40;https://sonarcloud.io/api/project_badges/measure?project=walt-id_waltid-ssikit-examples&metric=alert_status&#41;]&#40;https://sonarcloud.io/dashboard?id=walt-id_waltid-ssikit-examples&#41;)
 
 
-This repository demonstrates several usage examples of the Walt.ID SSI-Kit project.
+This repository demonstrates several usage examples of the walt.id SSI-Kit project.
 
 ### Setup
 
@@ -30,9 +30,8 @@ Build with **Maven**
 
 - **KeyManagement** - shows how to generate, to import/export and to delete cryptographic keys.
 - **Credentials** - shows how to generate JSON_LD as well as JWT credentials.
-- **CustomCredential** - shows how to create custom credential and use it encoded and decoded
-- **CustomData** - shows how to integrate a custom-data provider for populating Verifiable Credentials with data, as well as adding a custom policy for verifying Verifiable Presentations.
+- **CustomCredential** - shows how to add and to en-/decode a custom credential.
+- **CustomData** - shows how to populate a VC template with custom data.
+- **CustomDataAndPolicy** - shows how to implement a custom-data provider for populating Verifiable Credentials with data, as well as adding a custom policy for verifying Verifiable Presentations.
 - **CustomDataRest** - shows how to launch a RESTfull issuance- & verification-service using a custom data provider, custom credential template and custom verification policy.
-- **CustomVcTemplate** - shows how to add custom data to default VC template
-- **JsonLdCredentials** - shows how to utilize the low-level credential-service interface for signing JSON_LD credentials.
 - **DidEbsi** - shows the creation and anchoring of a **did:ebsi** on the EBSI ledger.

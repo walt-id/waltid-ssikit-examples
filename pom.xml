@@ -97,7 +97,7 @@
 
     <dependencies>
 
-        <!-- Walt.ID -->
+        <!-- walt.id -->
         <dependency>
             <groupId>id.walt</groupId>
             <artifactId>waltid-ssi-kit</artifactId>

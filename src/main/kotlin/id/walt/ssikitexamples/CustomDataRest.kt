@@ -13,7 +13,7 @@ import java.util.*
 
 
 fun main() {
-    // Load Walt.ID SSI-Kit services from "$workingDirectory/service-matrix.properties"
+    // Load walt.id SSI-Kit services from "$workingDirectory/service-matrix.properties"
     ServiceMatrix("service-matrix.properties")
 
     // Register custom data provider
@@ -32,27 +32,9 @@ fun main() {
 
     println(" walt.id Signatory API: http://${bindAddress}:7001")
     println(" walt.id Auditor API:   http://${bindAddress}:7003")
-
-
-    //TODO: implement the following calls using the ssikit rest client
-
-
-//    // Issue VC in JSON-LD and JWT format (for show-casing both formats)
-//    val vcJson = signatory.issue("CustomCredentialId", ProofConfig(issuerDid = issuer, subjectDid = holder, proofType = ProofType.LD_PROOF))
-//    val vcJwt = signatory.issue("VerifiableId", ProofConfig(issuerDid = issuer, subjectDid = holder, proofType = ProofType.JWT))
-//
-//    // Present VC in JSON-LD and JWT format (for show-casing both formats)
-//    val vpJson = custodian.createPresentation(listOf(vcJson), holder)
-//    val vpJwt = custodian.createPresentation(listOf(vcJwt), holder)
-//
-//    // Verify VPs, using Signature, JsonSchema and a custom policy
-//    val resJson = AuditorService.verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
-//    val resJwt = AuditorService.verify(vpJwt, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
-//
-//    println("JSON verification result: ${resJson.overallStatus}")
-//    println("JWT verification result: ${resJwt.overallStatus}")
 }
 
+// Custom Data Provider
 class CustomDataProvider : SignatoryDataProvider {
     override fun populate(template: VerifiableCredential, proofConfig: ProofConfig): VerifiableCredential {
         if (template is CustomCredential) {
