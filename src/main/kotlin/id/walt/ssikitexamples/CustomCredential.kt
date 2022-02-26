@@ -3,7 +3,6 @@ package id.walt.ssikitexamples
 import com.beust.klaxon.Json
 import id.walt.common.prettyPrint
 import id.walt.ssikitexamples.CustomCredential.CustomCredentialSubject
-import id.walt.vclib.credentials.Europass
 import id.walt.vclib.model.*
 import id.walt.vclib.registry.VcTypeRegistry
 import id.walt.vclib.registry.VerifiableCredentialMetadata
@@ -15,47 +14,38 @@ fun checkIfVendor(decodedCredential: VerifiableCredential): List<Any> = when (de
 
         listOf(subject.givenName!!, subject.type!!.contains("Vendor"))
     }
-    is Europass -> throw Error("Europass isn't supported, please supply an CustomCredential/XYZMarketCredential/...")
     else -> throw Error("Invalid credential was supplied!")
 }
 
 
 fun main() {
-    // Registering credential
+    // Registering a custom credential template
     VcTypeRegistry.register(CustomCredential.Companion, CustomCredential::class)
 
-    // Creating custom credential
-    // the proof signature is only an example
+    // Creating custom credential and set the data to be issued
     val myCustomCredential = CustomCredential(
         credentialSubject = CustomCredential.CustomCredentialSubject(
-            id = "did:example:123",
+            id = "did:example:subject-did",
             type = listOf(
                 "Vendor",
                 "Person"
             ),
-            givenName = "JOHN",
-            birthDate = "1958-08-17"
+            givenName = "SUSAN",
+            birthDate = "2002-02-20"
         ),
-        issuer = "did:example:456",
-        proof = Proof(
-            "Ed25519Signature2018",
-            "2020-04-22T10:37:22Z",
-            "assertionMethod",
-            "did:example:456#key-1",
-            "eyJjcml0IjpbImI2NCJdLCJiNjQiOmZhbHNlLCJhbGciOiJFZERTQSJ9..BhWew0x-txcroGjgdtK-yBCqoetg9DD9SgV4245TmXJi-PmqFzux6Cwaph0r-mbqzlE17yLebjfqbRT275U1AA"
-        )
+        issuer = "did:example:issuer-did"
     )
 
     println("This is my custom credential: $myCustomCredential")
 
     // Encoding a custom credential to JSON
-    val ecodedCredential = myCustomCredential.encode()
+    val encodedCredential = myCustomCredential.encode()
     println("Encoding credential ...")
-    println(ecodedCredential.prettyPrint())
+    println(encodedCredential.prettyPrint())
 
     // Decoding a JSON credential
     println("Decoding credential ...")
-    val decodedCredential: VerifiableCredential = ecodedCredential.toCredential()
+    val decodedCredential: VerifiableCredential = encodedCredential.toCredential()
     println(decodedCredential)
 
     // Check if Mister John is a Vendor
@@ -90,12 +80,13 @@ data class CustomCredential(
     @Json(serializeNull = false) override var proof: Proof? = null,
 ) : AbstractVerifiableCredential<CustomCredentialSubject>(type) {
     data class CustomCredentialSubject(
-        @Json(serializeNull = false) override var id: String? = null, // did:ebsi:00000004321
+        @Json(serializeNull = false) override var id: String? = null,
         @Json(serializeNull = false) var type: List<String>? = null,
-        @Json(serializeNull = false) var givenName: String? = null, // JOHN
-        @Json(serializeNull = false) var birthDate: String? = null // 1958-08-17
+        @Json(serializeNull = false) var givenName: String? = null,
+        @Json(serializeNull = false) var birthDate: String? = null
     ) : CredentialSubject()
 
+    // The following is the default-data, which can be substituted when issuing the credential.
     companion object : VerifiableCredentialMetadata(
         type = listOf("VerifiableCredential", "CustomCredential"),
         template = {
@@ -109,16 +100,8 @@ data class CustomCredential(
                     givenName = "JOHN",
                     birthDate = "1958-08-17"
                 ),
-                issuer = "did:example:456",
-                proof = Proof(
-                    "Ed25519Signature2018",
-                    "2020-04-22T10:37:22Z",
-                    "assertionMethod",
-                    "did:example:456#key-1",
-                    "eyJjcml0IjpbImI2NCJdLCJiNjQiOmZhbHNlLCJhbGciOiJFZERTQSJ9..BhWew0x-txcroGjgdtK-yBCqoetg9DD9SgV4245TmXJi-PmqFzux6Cwaph0r-mbqzlE17yLebjfqbRT275U1AA"
-                )
+                issuer = "did:example:456"
             )
         }
     )
-
 }
