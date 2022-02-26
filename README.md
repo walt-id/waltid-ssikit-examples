@@ -34,5 +34,4 @@ Build with **Maven**
 - **CustomData** - shows how to populate a VC template with custom data.
 - **CustomDataAndPolicy** - shows how to implement a custom-data provider for populating Verifiable Credentials with data, as well as adding a custom policy for verifying Verifiable Presentations.
 - **CustomDataRest** - shows how to launch a RESTfull issuance- & verification-service using a custom data provider, custom credential template and custom verification policy.
-- **JsonLdCredentials** - shows how to utilize the low-level credential-service interface for signing JSON_LD credentials.
 - **DidEbsi** - shows the creation and anchoring of a **did:ebsi** on the EBSI ledger.
