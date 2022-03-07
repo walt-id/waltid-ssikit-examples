@@ -23,18 +23,18 @@ fun main() {
     val expiration = Instant.now().plus(30, ChronoUnit.DAYS)
 
     // Issue VC in JSON-LD and JWT format (for show-casing both formats)
-    val vcJson = Signatory.getService().issue("VerifiableId", ProofConfig(issuerDid = issuerDid, subjectDid = holderDid, proofType = ProofType.LD_PROOF, expirationDate = expiration))
+    val vcJsonLd = Signatory.getService().issue("VerifiableId", ProofConfig(issuerDid = issuerDid, subjectDid = holderDid, proofType = ProofType.LD_PROOF, expirationDate = expiration))
     val vcJwt = Signatory.getService().issue("VerifiableId", ProofConfig(issuerDid = issuerDid, subjectDid = holderDid, proofType = ProofType.JWT, expirationDate = expiration))
 
     // Present VC in JSON-LD and JWT format (for show-casing both formats)
     // expiration date is not needed when JSON-LD format
-    val vpJson = Custodian.getService().createPresentation(listOf(vcJson), holderDid, expirationDate = null)
+    val vpJsonLd = Custodian.getService().createPresentation(listOf(vcJsonLd), holderDid, expirationDate = null)
     val vpJwt = Custodian.getService().createPresentation(listOf(vcJwt), holderDid, expirationDate = expiration)
 
     // Verify VPs, using Signature, JsonSchema and a custom policy
-    val resJson = Auditor.getService().verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy()))
+    val resJsonLd = Auditor.getService().verify(vpJsonLd, listOf(SignaturePolicy(), JsonSchemaPolicy()))
     val resJwt = Auditor.getService().verify(vpJwt, listOf(SignaturePolicy(), JsonSchemaPolicy()))
 
-    println("JSON verification result: ${resJson.valid}")
+    println("JSON-LD verification result: ${resJsonLd.valid}")
     println("JWT verification result: ${resJwt.valid}")
 }

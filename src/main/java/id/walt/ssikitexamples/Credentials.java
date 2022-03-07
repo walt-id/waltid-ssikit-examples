@@ -32,19 +32,19 @@ public class Credentials {
         var expiration = Instant.now().plus(30, ChronoUnit.DAYS);
 
         // Issue VC in JSON-LD and JWT format (for show-casing both formats)
-        var vcJson = Signatory.Companion.getService().issue("VerifiableId", createProofConfig(issuerDid, holderDid, ProofType.LD_PROOF, expiration), null);
+        var vcJsonLd = Signatory.Companion.getService().issue("VerifiableId", createProofConfig(issuerDid, holderDid, ProofType.LD_PROOF, expiration), null);
         var vcJwt = Signatory.Companion.getService().issue("VerifiableId", createProofConfig(issuerDid, holderDid, ProofType.JWT, expiration), null);
 
         // Present VC in JSON-LD and JWT format (for show-casing both formats)
         // expiration date is not needed when JSON-LD format
-        var vpJson = Custodian.Companion.getService().createPresentation(List.of(vcJson), holderDid, null, null, null, null);
+        var vpJsonLd = Custodian.Companion.getService().createPresentation(List.of(vcJsonLd), holderDid, null, null, null, null);
         var vpJwt = Custodian.Companion.getService().createPresentation(List.of(vcJwt), holderDid, null, null, null, expiration);
 
         // Verify VPs, using Signature, JsonSchema and a custom policy
-        var resJson = Auditor.Companion.getService().verify(vpJson, List.of(new SignaturePolicy(), new JsonSchemaPolicy()));
+        var resJsonLd = Auditor.Companion.getService().verify(vpJsonLd, List.of(new SignaturePolicy(), new JsonSchemaPolicy()));
         var resJwt = Auditor.Companion.getService().verify(vpJwt, List.of(new SignaturePolicy(), new JsonSchemaPolicy()));
 
-        System.out.println("JSON verification result: " + resJson.getValid());
+        System.out.println("JSON-LD verification result: " + resJsonLd.getValid());
         System.out.println("JWT verification result: " + resJwt.getValid());
     }
 
