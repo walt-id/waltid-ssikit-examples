@@ -20,22 +20,21 @@ fun main() {
     val issuerDid = DidService.create(DidMethod.ebsi)
     val holderDid = DidService.create(DidMethod.key)
 
-    // Issue VC in JSON-LD and JWT format (for show-casing both formats)
     val expiration = Instant.now().plus(30, ChronoUnit.DAYS)
-    val vcJson = Signatory.getService()
-        .issue("VerifiableId", ProofConfig(issuerDid = issuerDid, subjectDid = holderDid, proofType = ProofType.LD_PROOF, expirationDate = expiration))
 
-    val vcJwt = Signatory.getService()
-        .issue("VerifiableId", ProofConfig(issuerDid = issuerDid, subjectDid = holderDid, proofType = ProofType.JWT, expirationDate = expiration))
+    // Issue VC in JSON-LD and JWT format (for show-casing both formats)
+    val vcJsonLd = Signatory.getService().issue("VerifiableId", ProofConfig(issuerDid = issuerDid, subjectDid = holderDid, proofType = ProofType.LD_PROOF, expirationDate = expiration))
+    val vcJwt = Signatory.getService().issue("VerifiableId", ProofConfig(issuerDid = issuerDid, subjectDid = holderDid, proofType = ProofType.JWT, expirationDate = expiration))
 
     // Present VC in JSON-LD and JWT format (for show-casing both formats)
-    val vpJson = Custodian.getService().createPresentation(listOf(vcJson), holderDid, expirationDate = expiration)
+    // expiration date is not needed when JSON-LD format
+    val vpJsonLd = Custodian.getService().createPresentation(listOf(vcJsonLd), holderDid, expirationDate = null)
     val vpJwt = Custodian.getService().createPresentation(listOf(vcJwt), holderDid, expirationDate = expiration)
 
     // Verify VPs, using Signature, JsonSchema and a custom policy
-    val resJson = Auditor.getService().verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy()))
+    val resJsonLd = Auditor.getService().verify(vpJsonLd, listOf(SignaturePolicy(), JsonSchemaPolicy()))
     val resJwt = Auditor.getService().verify(vpJwt, listOf(SignaturePolicy(), JsonSchemaPolicy()))
 
-    println("JSON verification result: ${resJson.valid}")
+    println("JSON-LD verification result: ${resJsonLd.valid}")
     println("JWT verification result: ${resJwt.valid}")
 }

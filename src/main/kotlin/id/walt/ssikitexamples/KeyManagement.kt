@@ -18,6 +18,7 @@ fun main() {
 
     // loading key by ID
     val keyHandle1 = keyService.load(keyId.id)
+    println("${keyHandle1} has been loaded by keyId into KeyService.")
 
     // adding an key alias
     val keyAlias = "${keyId}Alias"
@@ -25,23 +26,20 @@ fun main() {
 
     // loading key by alias
     val keyHandle2 = keyService.load(keyAlias)
+    println("${keyHandle2} has been loaded by alias into KeyService.")
 
     // exporting public key in JWK format
-    val exportedPubKey = keyService.export(keyAlias)
-
-    println(exportedPubKey)
+    val exportedPubKey = keyService.export(keyAlias, KeyFormat.JWK, KeyType.PUBLIC)
+    println("${exportedPubKey} public key exported in JWK format.")
 
     // exporting private key in JWK format. Note that KeyFormat and KeyType are optional parameter.
     val exportedPrivKey = keyService.export(keyAlias, KeyFormat.JWK, KeyType.PRIVATE)
-
-    println(exportedPrivKey)
+    println("${exportedPrivKey} private key exported in JWK format.")
 
     // Deleting key
     keyService.delete(keyId.id)
 
     // Importing key
-    keyService.importKey(exportedPrivKey)
-
-
-    val keyHandle3 = keyService.load(keyId.id)
+    val importedKeyId = keyService.importKey(exportedPrivKey)
+    println("${importedKeyId} imported into KeyService")
 }
