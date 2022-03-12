@@ -61,7 +61,7 @@ data class CustomCredential(
     var context: List<String> = listOf("https://www.w3.org/2018/credentials/v1"),
     override var id: String? = null,
     override var issuer: String?,
-    @Json(serializeNull = false) override var issuanceDate: String? = null,
+    @Json(serializeNull = false) override var issued: String? = null,
     @Json(serializeNull = false) override var validFrom: String? = null,
     @Json(serializeNull = false) override var expirationDate: String? = null,
     @Json(serializeNull = false) override var credentialSubject: CustomCredentialSubject?,

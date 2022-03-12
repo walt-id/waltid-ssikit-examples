@@ -14,6 +14,7 @@ import id.walt.vclib.model.VerifiableCredential;
 import org.jetbrains.annotations.NotNull;
 
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -125,7 +126,7 @@ class IdDataCustomProvider implements SignatoryDataProvider {
         ofNullable(proofConfig.getIssueDate()).ifPresent(issueDate -> vc.setIssuanceDate(dateFormat.format(issueDate)));
         ofNullable(proofConfig.getExpirationDate()).ifPresent(expirationDate -> vc.setExpirationDate(dateFormat.format(expirationDate)));
         vc.setValidFrom(vc.getIssuanceDate());
-        ((VerifiableId) vc).getEvidence().setVerifier(proofConfig.getIssuerDid());
+        ((VerifiableId) vc).getEvidence().get(0).setVerifier(proofConfig.getIssuerDid());
         ((VerifiableId) vc).setCredentialSubject(createCredentialSubject(idData));
 
         return vc;
@@ -141,7 +142,7 @@ class IdDataCustomProvider implements SignatoryDataProvider {
                 idData.getPersonalIdentifier(),
                 idData.getNameAndFamilyNameAtBirth(),
                 idData.getPlaceOfBirth(),
-                idData.getCurrentAddress(),
+                Collections.singletonList(idData.getCurrentAddress()),
                 idData.getGender());
     }
 }

@@ -5,13 +5,13 @@ plugins {
 }
 
 group = "id.walt"
-version = "1.3.0"
+// Same as SSI Kit version
+version = "1.7.0"
 
 repositories {
     mavenCentral()
     maven("https://maven.walt.id/repository/waltid/")
     maven("https://maven.walt.id/repository/waltid-ssi-kit/")
-    maven("https://maven.walt.id/repository/danubetech")
     maven("https://repo.danubetech.com/repository/maven-public/")
     maven("https://jitpack.io")
     mavenLocal()
@@ -19,9 +19,9 @@ repositories {
 
 dependencies {
     // walt.id
-    implementation("id.walt:waltid-ssi-kit:1.6.2")
+    implementation("id.walt:waltid-ssi-kit:1.7.0")
     implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.1.0")
-    implementation("id.walt:waltid-ssikit-vclib:1.14.1")
+    implementation("id.walt:waltid-ssikit-vclib:1.16.0")
 
     // Kotlin
     implementation(kotlin("stdlib"))
