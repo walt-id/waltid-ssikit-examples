@@ -26,7 +26,7 @@ public class CustomDataAndPolicy {
     }
 
     public void run() {
-        // Load walt.id SSI-Kit services from "$workingDirectory/service-matrix.properties"
+        // Load walt.id SSI Kit services from "$workingDirectory/service-matrix.properties"
         new ServiceMatrix("service-matrix.properties");
 
         // Define used services
@@ -43,7 +43,7 @@ public class CustomDataAndPolicy {
 
         // Issue VC in JSON-LD and JWT format
         var vcJsonLd = signatory.issue("VerifiableId", createProofConfig(issuer.getDid(), holder.getDid(), ProofType.LD_PROOF, holder.getPersonalIdentifier()), null);
-        System.out.println("\n------------------------------- VC in JSON_LD format -------------------------------");
+        System.out.println("\n------------------------------- VC in JSON-LD format -------------------------------");
         System.out.println(vcJsonLd);
 
         var vcJwt = signatory.issue("VerifiableId", createProofConfig(issuer.getDid(), holder.getDid(), ProofType.JWT, holder.getPersonalIdentifier()), null);
@@ -51,19 +51,19 @@ public class CustomDataAndPolicy {
         System.out.println(vcJwt);
 
         // Present VC in JSON-LD and JWT format
-        var vpJson = custodian.createPresentation(List.of(vcJsonLd), holder.getDid(), null, null, null, null);
-        System.out.println("------------------------------- VP in JSON_LD format -------------------------------");
-        System.out.println(vpJson);
+        var vpJsonLd = custodian.createPresentation(List.of(vcJsonLd), holder.getDid(), null, null, null, null);
+        System.out.println("------------------------------- VP in JSON-LD format -------------------------------");
+        System.out.println(vpJsonLd);
 
         var vpJwt = custodian.createPresentation(List.of(vcJwt), holder.getDid(), null, null, null, null);
         System.out.println("\n------------------------------- VP in JWT format -------------------------------");
         System.out.println(vpJwt);
 
         // Verify VPs, using Signature, JsonSchema and a custom policy
-        var resJson = Auditor.Companion.getService().verify(vpJson, List.of(new SignaturePolicy(), new JsonSchemaPolicy(), new CustomPolicy()));
+        var resJsonLd = Auditor.Companion.getService().verify(vpJsonLd, List.of(new SignaturePolicy(), new JsonSchemaPolicy(), new CustomPolicy()));
         var resJwt = Auditor.Companion.getService().verify(vpJwt, List.of(new SignaturePolicy(), new JsonSchemaPolicy(), new CustomPolicy()));
 
-        System.out.println("JSON verification result: " + resJson.getValid());
+        System.out.println("JSON verification result: " + resJsonLd.getValid());
         System.out.println("JWT verification result: " + resJwt.getValid());
     }
 
@@ -111,7 +111,7 @@ class IdDataCustomProvider implements SignatoryDataProvider {
             // get ID data for the given subject
             var idData = ofNullable(proofConfig.getDataProviderIdentifier())
                     .map(MockedIdDatabase.INSTANCE::get)
-                    .orElseThrow(() -> new RuntimeException("No ID data found for the given data-povider identifier"));
+                    .orElseThrow(() -> new RuntimeException("No ID data found for the given data-provider identifier"));
 
             return updateCustomVerifiableCredential(template, proofConfig, idData);
         } else {
@@ -122,8 +122,8 @@ class IdDataCustomProvider implements SignatoryDataProvider {
     private VerifiableCredential updateCustomVerifiableCredential(VerifiableCredential vc, ProofConfig proofConfig, IdData idData) {
         vc.setId("identity#verifiableID#" + UUID.randomUUID());
         vc.setIssuer(proofConfig.getIssuerDid());
-        ofNullable(proofConfig.getIssueDate()).ifPresent(issueDate -> vc.setIssuanceDate(dateFormat.format(proofConfig.getIssueDate())));
-        ofNullable(proofConfig.getExpirationDate()).ifPresent(expirationDate -> vc.setExpirationDate(dateFormat.format(proofConfig.getExpirationDate())));
+        ofNullable(proofConfig.getIssueDate()).ifPresent(issueDate -> vc.setIssuanceDate(dateFormat.format(issueDate)));
+        ofNullable(proofConfig.getExpirationDate()).ifPresent(expirationDate -> vc.setExpirationDate(dateFormat.format(expirationDate)));
         vc.setValidFrom(vc.getIssuanceDate());
         ((VerifiableId) vc).getEvidence().setVerifier(proofConfig.getIssuerDid());
         ((VerifiableId) vc).setCredentialSubject(createCredentialSubject(idData));
