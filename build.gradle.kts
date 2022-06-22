@@ -8,6 +8,7 @@ group = "id.walt"
 // Same as SSI Kit version
 version = "1.7.0"
 
+
 repositories {
     mavenCentral()
     maven("https://maven.walt.id/repository/waltid/")
@@ -20,14 +21,14 @@ repositories {
 dependencies {
     // walt.id
     implementation("id.walt:waltid-ssi-kit:1.7.0")
-    implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.1.0")
-    implementation("id.walt:waltid-ssikit-vclib:1.16.0")
+    implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.1.1")
+    implementation("id.walt:waltid-ssikit-vclib:1.22.0")
 
     // Kotlin
     implementation(kotlin("stdlib"))
 
     // JSON
-    implementation("com.beust:klaxon:5.5")
+    implementation("com.beust:klaxon:5.6")
 }
 
 tasks.withType<Test> {
