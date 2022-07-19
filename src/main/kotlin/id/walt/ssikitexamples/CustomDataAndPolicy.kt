@@ -15,7 +15,11 @@ import java.util.*
 val signatory = Signatory.getService()
 val custodian = Custodian.getService()
 
-fun main() {
+fun main(){
+    customDataAndPolicy()
+}
+
+fun customDataAndPolicy() {
     // Load walt.id SSI-Kit services from "$workingDirectory/service-matrix.properties"
     ServiceMatrix("service-matrix.properties")
 

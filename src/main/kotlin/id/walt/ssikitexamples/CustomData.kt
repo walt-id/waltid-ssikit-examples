@@ -12,7 +12,12 @@ import id.walt.signatory.Signatory
 import id.walt.signatory.dataproviders.MergingDataProvider
 import id.walt.vclib.templates.VcTemplateManager
 
-fun main() {
+
+fun main(){
+    customData()
+}
+
+fun customData() {
     // Load walt.id SSI-Kit services from "$workingDirectory/service-matrix.properties"
     ServiceMatrix("service-matrix.properties")
 
@@ -59,3 +64,4 @@ fun main() {
 fun credentialSubjectEntry(vararg pairs: Pair<String, String>): Pair<String, Map<String, String>> {
     return Pair("credentialSubject", pairs.toMap())
 }
+
