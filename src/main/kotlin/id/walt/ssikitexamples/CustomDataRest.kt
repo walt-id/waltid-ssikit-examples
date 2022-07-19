@@ -20,7 +20,7 @@ fun main() {
     DataProviderRegistry.register(CustomCredential::class, CustomDataProvider())
 
     // Registering custom verification policy
-    PolicyRegistry.register(MyCustomPolicy())
+    PolicyRegistry.register(MyCustomPolicy::class, "My custom policy")
 
     // Registering a custom Credential Template
     VcTypeRegistry.register(CustomCredential.Companion, CustomCredential::class)

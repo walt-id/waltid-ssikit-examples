@@ -1,10 +1,7 @@
 package id.walt.ssikitexamples
 
 import com.beust.klaxon.Json
-import id.walt.auditor.Auditor
-import id.walt.auditor.JsonSchemaPolicy
-import id.walt.auditor.SignaturePolicy
-import id.walt.auditor.VerificationPolicy
+import id.walt.auditor.*
 import id.walt.custodian.Custodian
 import id.walt.servicematrix.ServiceMatrix
 import id.walt.signatory.*
@@ -60,7 +57,7 @@ fun main() {
 
 
 // Custom Policy
-class MyCustomPolicy : VerificationPolicy() {
+class MyCustomPolicy : SimpleVerificationPolicy() {
     override val description: String
         get() = "A custom verification policy"
 

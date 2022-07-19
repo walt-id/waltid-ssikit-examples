@@ -19,15 +19,18 @@ repositories {
 
 dependencies {
     // walt.id
-    implementation("id.walt:waltid-ssi-kit:1.7.0")
-    implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.1.0")
+    implementation("id.walt:waltid-ssi-kit:1.11.0-SNAPSHOT")
+    implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.1.1")
     implementation("id.walt:waltid-ssikit-vclib:1.16.0")
+
+    // Logging
+    implementation("org.slf4j:slf4j-api:2.0.0-alpha5")
 
     // Kotlin
     implementation(kotlin("stdlib"))
 
     // JSON
-    implementation("com.beust:klaxon:5.5")
+    implementation("com.beust:klaxon:5.6")
 }
 
 tasks.withType<Test> {
