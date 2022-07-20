@@ -13,6 +13,11 @@ public class DidEbsi {
     private final KeyService keyService = KeyService.Companion.getService();
     private final DidEbsiService didEbsiService = DidEbsiService.Companion.getService();
 
+    ///////////////////////////////////////////////////////////////////////////
+    // PREREQUISITE
+    // Place token from https://app.preprod.ebsi.eu/users-onboarding/ in file data/ebsi/bearer-token.txt
+    ///////////////////////////////////////////////////////////////////////////
+
     public static void main(String[] args) {
         new DidEbsi().run();
     }
@@ -45,10 +50,6 @@ public class DidEbsi {
         var didDoc = DidService.INSTANCE.loadDidEbsi(didEbsi);
         System.out.print("\nDID EBSI Document loaded:\n" + didDoc.encodePretty());
 
-        ///////////////////////////////////////////////////////////////////////////
-        // Registering the DID on the ledger
-        // Pre requisite: put token from https://app.preprod.ebsi.eu/users-onboarding/ in file data/ebsi/bearer-token.txt
-        ///////////////////////////////////////////////////////////////////////////
 
         EssifClient.INSTANCE.onboard(didEbsi, null);
 
