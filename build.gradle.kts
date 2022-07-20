@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "1.6.10"
+    kotlin("jvm") version "1.6.21"
     java
     application
 }
@@ -19,7 +19,7 @@ repositories {
 
 dependencies {
     // walt.id
-    implementation("id.walt:waltid-ssi-kit:1.11.0-SNAPSHOT")
+    implementation("id.walt:waltid-ssi-kit:1.12.0")
     implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.1.1")
     implementation("id.walt:waltid-ssikit-vclib:1.16.0")
 

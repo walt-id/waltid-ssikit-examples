@@ -12,7 +12,11 @@ import id.walt.vclib.registry.VcTypeRegistry
 import java.util.*
 
 
-fun main() {
+fun main(){
+    customDataRest()
+}
+
+fun customDataRest() {
     // Load walt.id SSI-Kit services from "$workingDirectory/service-matrix.properties"
     ServiceMatrix("service-matrix.properties")
 

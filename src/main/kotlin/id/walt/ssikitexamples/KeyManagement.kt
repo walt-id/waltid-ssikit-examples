@@ -6,7 +6,11 @@ import id.walt.services.key.KeyFormat
 import id.walt.services.key.KeyService
 import id.walt.services.keystore.KeyType
 
-fun main() {
+fun main(){
+    keyManagement()
+}
+
+fun keyManagement() {
     // Load walt.id SSI-Kit services from "$workingDirectory/service-matrix.properties"
     ServiceMatrix("service-matrix.properties")
 

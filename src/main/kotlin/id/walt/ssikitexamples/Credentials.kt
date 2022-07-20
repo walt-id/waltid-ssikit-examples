@@ -13,7 +13,13 @@ import id.walt.signatory.Signatory
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-fun main() {
+
+fun main()
+{
+    credentials()
+}
+
+fun credentials() {
     // Load walt.id SSI-Kit services from "$workingDirectory/service-matrix.properties"
     ServiceMatrix("service-matrix.properties")
 
@@ -38,3 +44,5 @@ fun main() {
     println("JSON-LD verification result: ${resJsonLd.valid}")
     println("JWT verification result: ${resJwt.valid}")
 }
+
+

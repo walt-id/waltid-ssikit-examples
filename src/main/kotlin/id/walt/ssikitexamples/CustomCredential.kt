@@ -7,7 +7,11 @@ import id.walt.vclib.model.*
 import id.walt.vclib.registry.VcTypeRegistry
 import id.walt.vclib.registry.VerifiableCredentialMetadata
 
-fun main() {
+fun main(){
+    customCredential()
+}
+
+fun customCredential() {
     // Registering a custom credential template
     VcTypeRegistry.register(CustomCredential.Companion, CustomCredential::class)
 
@@ -56,7 +60,7 @@ fun main() {
 }
 
 // This is our custom credential
-data class CustomCredential(
+    data class CustomCredential(
     @Json(name = "@context")
     var context: List<String> = listOf("https://www.w3.org/2018/credentials/v1"),
     override var id: String? = null,
@@ -103,4 +107,6 @@ fun checkIfVendor(decodedCredential: VerifiableCredential): List<Any> = when (de
     }
     else -> throw Error("Invalid credential was supplied!")
 }
+
+
 
