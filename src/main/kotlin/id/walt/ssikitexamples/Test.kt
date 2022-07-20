@@ -1,7 +1,5 @@
 package id.walt.ssikitexamples
 
-import id.walt.ssikitexamples.*
-
 fun main(){
     println("************ Credentials test ************")
     credentials()
@@ -13,8 +11,5 @@ fun main(){
     customDataAndPolicy()
     println("************ Key management test ************")
     keyManagement()
-    println("************ Custom data rest test ************")
-    customDataRest()
-
 }
 
