@@ -4,8 +4,8 @@ import id.walt.crypto.KeyAlgorithm;
 import id.walt.model.DidMethod;
 import id.walt.servicematrix.ServiceMatrix;
 import id.walt.services.did.DidService;
-import id.walt.services.essif.EssifClient;
-import id.walt.services.essif.didebsi.DidEbsiService;
+import id.walt.services.ecosystems.essif.EssifClient;
+import id.walt.services.ecosystems.essif.didebsi.DidEbsiService;
 import id.walt.services.key.KeyService;
 
 public class DidEbsi {

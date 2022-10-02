@@ -56,7 +56,8 @@ public class CustomData {
         // Custom VC template
         var verifiableDiploma = new MergingDataProvider(data).populate(
                 verifiableDiplomaTemplate,
-                new ProofConfig(issuerDid, holderDid, null, null, ProofType.LD_PROOF, null, null, null, null, null, null, null, null)
+                new ProofConfig(issuerDid, holderDid, null, null, ProofType.LD_PROOF, null, null,
+                        null, null, null, null, null, null, null,null, null)
         );
         System.out.println("Verifiable Diploma with custom data - " + verifiableDiploma.encodePretty());
 

@@ -19,9 +19,9 @@ repositories {
 
 dependencies {
     // walt.id
-    implementation("id.walt:waltid-ssi-kit:1.12.0")
-    implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.1.1")
-    implementation("id.walt:waltid-ssikit-vclib:1.16.0")
+    implementation("id.walt:waltid-ssi-kit:1.13.0-SNAPSHOT")
+    implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.1.2")
+    implementation("id.walt:waltid-ssikit-vclib:1.23.5")
 
     // Logging
     implementation("org.slf4j:slf4j-api:2.0.0-alpha5")
