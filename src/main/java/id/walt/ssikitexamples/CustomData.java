@@ -5,6 +5,7 @@ import id.walt.model.DidMethod;
 import id.walt.servicematrix.ServiceMatrix;
 import id.walt.services.did.DidService;
 import id.walt.services.key.KeyService;
+import id.walt.signatory.Ecosystem;
 import id.walt.signatory.ProofConfig;
 import id.walt.signatory.ProofType;
 import id.walt.signatory.Signatory;
@@ -57,7 +58,7 @@ public class CustomData {
         var verifiableDiploma = new MergingDataProvider(data).populate(
                 verifiableDiplomaTemplate,
                 new ProofConfig(issuerDid, holderDid, null, null, ProofType.LD_PROOF, null, null,
-                        null, null, null, null, null, null, null,null, null)
+                        null, null, null, null, null, null, null,null, Ecosystem.DEFAULT)
         );
         System.out.println("Verifiable Diploma with custom data - " + verifiableDiploma.encodePretty());
 

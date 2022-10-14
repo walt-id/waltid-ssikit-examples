@@ -7,6 +7,7 @@ import id.walt.custodian.Custodian;
 import id.walt.model.DidMethod;
 import id.walt.servicematrix.ServiceMatrix;
 import id.walt.services.did.DidService;
+import id.walt.signatory.Ecosystem;
 import id.walt.signatory.ProofConfig;
 import id.walt.signatory.ProofType;
 import id.walt.signatory.Signatory;
@@ -50,6 +51,6 @@ public class Credentials {
 
     public ProofConfig createProofConfig(String issuerDid, String subjectDid, ProofType proofType, Instant expiration) {
         return new ProofConfig(issuerDid, subjectDid, null, null, proofType, null, null,
-                null, null, null, null, expiration, null, null, null, null);
+                null, null, null, null, expiration, null, null, null, Ecosystem.DEFAULT);
     }
 }
