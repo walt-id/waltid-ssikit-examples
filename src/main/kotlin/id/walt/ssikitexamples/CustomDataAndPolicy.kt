@@ -1,14 +1,19 @@
 package id.walt.ssikitexamples
 
 import com.beust.klaxon.Json
-import id.walt.auditor.*
+import id.walt.auditor.Auditor
+import id.walt.auditor.JsonSchemaPolicy
+import id.walt.auditor.SignaturePolicy
+import id.walt.auditor.SimpleVerificationPolicy
+import id.walt.credentials.w3c.VerifiableCredential
+import id.walt.credentials.w3c.builder.W3CCredentialBuilder
 import id.walt.custodian.Custodian
 import id.walt.servicematrix.ServiceMatrix
-import id.walt.signatory.*
-import id.walt.vclib.credentials.VerifiableId
-import id.walt.vclib.credentials.VerifiablePresentation
-import id.walt.vclib.model.VerifiableCredential
-import id.walt.vclib.schema.SchemaService
+import id.walt.signatory.ProofConfig
+import id.walt.signatory.ProofType
+import id.walt.signatory.Signatory
+import id.walt.signatory.SignatoryDataProvider
+import java.time.Instant
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -28,18 +33,22 @@ fun customDataAndPolicy() {
     val holder = idIter.next()
     val issuer = idIter.next()
 
-    // Register custom data provider
-    DataProviderRegistry.register(VerifiableId::class, CustomIdDataProvider())
-
     // Issue VC in JSON-LD and JWT format
     val vcJsonLd = signatory.issue(
         "VerifiableId",
-        ProofConfig(issuerDid = issuer.did, subjectDid = holder.did, proofType = ProofType.LD_PROOF, dataProviderIdentifier = holder.personalIdentifier)
+        ProofConfig(issuerDid = issuer.did, subjectDid = holder.did, proofType = ProofType.LD_PROOF, dataProviderIdentifier = holder.personalIdentifier),
+        dataProvider = CustomIdDataProvider()
     )
     println("\n------------------------------- VC in JSON_LD format -------------------------------")
     println(vcJsonLd)
-    val vcJwt =
-        signatory.issue("VerifiableId", ProofConfig(issuerDid = issuer.did, subjectDid = holder.did, proofType = ProofType.JWT, dataProviderIdentifier = holder.personalIdentifier))
+    val vcJwt = signatory.issue(
+        "VerifiableId", ProofConfig(
+            issuerDid = issuer.did,
+            subjectDid = holder.did,
+            proofType = ProofType.JWT,
+            dataProviderIdentifier = holder.personalIdentifier
+        ), dataProvider = CustomIdDataProvider()
+    )
     println("\n------------------------------- VC in JWT format -------------------------------")
     println(vcJwt)
 
@@ -66,52 +75,55 @@ class MyCustomPolicy : SimpleVerificationPolicy() {
         get() = "A custom verification policy"
 
     override fun doVerify(vc: VerifiableCredential): Boolean {
-        if (vc is VerifiableId) {
-            val idData = MockedIdDatabase.get(vc.credentialSubject!!.personalIdentifier!!)
-            if (idData != null) {
-                return idData.familyName == vc.credentialSubject?.familyName && idData.firstName == vc.credentialSubject?.firstName
-            }
-        } else if (vc is VerifiablePresentation) {
-            // This custom policy does not verify the VerifiablePresentation
-            return true
+        return when (vc.type[0]) {
+            "VerifiableCredential" -> MockedIdDatabase.get(vc.credentialSubject!!.properties["personalIdentifier"] as String)
+                ?.let {
+                    it.familyName == vc.credentialSubject!!.properties["familyName"] && it.firstName == vc.credentialSubject!!.properties["firstName"]
+                } ?: false
+            "VerifiablePresentation" -> true
+            else -> false
         }
-        return false
     }
 }
 
 // Custom Data Provider
 class CustomIdDataProvider : SignatoryDataProvider {
 
-    @field:SchemaService.JsonIgnore
     @Json(ignored = true)
-    open val dateFormat = DateTimeFormatter.ISO_INSTANT!!
+    val dateFormat = DateTimeFormatter.ISO_INSTANT!!
 
-    override fun populate(template: VerifiableCredential, proofConfig: ProofConfig): VerifiableCredential {
-        if (template is VerifiableId) {
-            // get ID data for the given subject
-            val idData = MockedIdDatabase.get(proofConfig.dataProviderIdentifier!!) ?: throw Exception("No ID data found for the given data-povider identifier")
+    override fun populate(credentialBuilder: W3CCredentialBuilder, proofConfig: ProofConfig): W3CCredentialBuilder {
+        return when(credentialBuilder.type.last()) {
+            "VerifiableId" -> {
+                credentialBuilder.setId("identity#verifiableID#${UUID.randomUUID()}")
+                    .setIssuer(proofConfig.issuerDid)
+                    .setIssuanceDate(if (proofConfig.issueDate != null) Instant.parse(dateFormat.format(proofConfig.issueDate)) else Instant.now())
+                    .setExpirationDate(
+                        if (proofConfig.expirationDate != null) Instant.parse(
+                            dateFormat.format(
+                                proofConfig.expirationDate
+                            )
+                        ) else Instant.now()
+                    )
+                    .setValidFrom(if (proofConfig.issueDate != null) Instant.parse(dateFormat.format(proofConfig.issueDate)) else Instant.now())
+                    .setProperty("evidence", buildMap {
+                        put("verifier", proofConfig.issuerDid)
+                    }).buildSubject {
+                        // get ID data for the given subject
+                        val idData = MockedIdDatabase.get(proofConfig.dataProviderIdentifier!!)
+                            ?: throw Exception("No ID data found for the given data-povider identifier")
+                        setProperty("familyName", idData.familyName)
+                        setProperty("firstName", idData.firstName)
+                        setProperty("dateOfBirth", idData.dateOfBirth)
+                        setProperty("personalIdentifier", idData.personalIdentifier)
+                        setProperty("nameAndFamilyNameAtBirth", idData.nameAndFamilyNameAtBirth)
+                        setProperty("placeOfBirth", idData.placeOfBirth)
+                        setProperty("currentAddress", listOf(idData.currentAddress))
+                        setProperty("gender", idData.gender)
+                    }
+            }
 
-            template.id = "identity#verifiableID#${UUID.randomUUID()}"
-            template.issuer = proofConfig.issuerDid
-            if (proofConfig.issueDate != null) template.issuanceDate = dateFormat.format(proofConfig.issueDate)
-            if (proofConfig.expirationDate != null) template.expirationDate = dateFormat.format(proofConfig.expirationDate)
-            template.validFrom = template.issuanceDate
-            template.evidence!![0].verifier = proofConfig.issuerDid
-            template.credentialSubject = VerifiableId.VerifiableIdSubject(
-                idData.did,
-                null,
-                idData.familyName,
-                idData.firstName,
-                idData.dateOfBirth,
-                idData.personalIdentifier,
-                idData.nameAndFamilyNameAtBirth,
-                idData.placeOfBirth,
-                listOf(idData.currentAddress),
-                idData.gender
-            )
-            return template
-        } else {
-            throw IllegalArgumentException("Only VerifiableId is supported by this data provider")
+            else -> throw IllegalArgumentException("Only VerifiableId is supported by this data provider");
         }
     }
 }

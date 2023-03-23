@@ -1,6 +1,8 @@
 package id.walt.ssikitexamples
 
 import id.walt.common.prettyPrint
+import id.walt.credentials.w3c.builder.W3CCredentialBuilder
+import id.walt.credentials.w3c.templates.VcTemplateManager
 import id.walt.crypto.KeyAlgorithm
 import id.walt.model.DidMethod
 import id.walt.servicematrix.ServiceMatrix
@@ -10,7 +12,6 @@ import id.walt.signatory.ProofConfig
 import id.walt.signatory.ProofType
 import id.walt.signatory.Signatory
 import id.walt.signatory.dataproviders.MergingDataProvider
-import id.walt.vclib.templates.VcTemplateManager
 
 
 fun main(){
@@ -40,7 +41,7 @@ fun customData() {
     }
 
     // Load a VC template
-    val verifiableDiplomaTemplate = VcTemplateManager.loadTemplate("VerifiableDiploma")
+    val verifiableDiplomaTemplate = VcTemplateManager.getTemplate("VerifiableDiploma")
     println("Default Verifiable Diploma - " + verifiableDiplomaTemplate.prettyPrint())
 
     // Prepare desired custom data that should replace the default template data
@@ -54,9 +55,9 @@ fun customData() {
 
     // Populate VC template with custom data
     val verifiableDiploma = MergingDataProvider(data).populate(
-        verifiableDiplomaTemplate,
+        W3CCredentialBuilder(),
         ProofConfig(subjectDid = holderDid, issuerDid = issuerDid, proofType = ProofType.LD_PROOF)
-    )
+    ).build()
     println("Verifiable Diploma with custom data - " + verifiableDiploma.prettyPrint())
 
 }

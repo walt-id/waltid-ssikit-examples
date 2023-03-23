@@ -2,13 +2,13 @@ package id.walt.ssikitexamples
 
 import id.walt.auditor.AuditorRestAPI
 import id.walt.auditor.PolicyRegistry
+import id.walt.credentials.w3c.VerifiableCredential
+import id.walt.credentials.w3c.builder.W3CCredentialBuilder
+import id.walt.credentials.w3c.templates.VcTemplateManager
 import id.walt.servicematrix.ServiceMatrix
-import id.walt.signatory.DataProviderRegistry
 import id.walt.signatory.ProofConfig
 import id.walt.signatory.SignatoryDataProvider
 import id.walt.signatory.rest.SignatoryRestAPI
-import id.walt.vclib.model.VerifiableCredential
-import id.walt.vclib.registry.VcTypeRegistry
 import java.util.*
 
 
@@ -20,14 +20,14 @@ fun customDataRest() {
     // Load walt.id SSI-Kit services from "$workingDirectory/service-matrix.properties"
     ServiceMatrix("service-matrix.properties")
 
-    // Register custom data provider
-    DataProviderRegistry.register(CustomCredential::class, CustomDataProvider())
+    // Creating custom credential and set the data to be issued
+    val myCustomCredential = VerifiableCredential.fromJson(customCredentialData)
 
     // Registering custom verification policy
     PolicyRegistry.register(MyCustomPolicy::class, "My custom policy")
 
     // Registering a custom Credential Template
-    VcTypeRegistry.register(CustomCredential.Companion, CustomCredential::class)
+    VcTemplateManager.register(customCredentialData::class.java.name, myCustomCredential)
 
     // Starting REST Services
     val bindAddress = "127.0.0.1"
@@ -40,19 +40,18 @@ fun customDataRest() {
 
 // Custom Data Provider
 class CustomDataProvider : SignatoryDataProvider {
-    override fun populate(template: VerifiableCredential, proofConfig: ProofConfig): VerifiableCredential {
-        if (template is CustomCredential) {
-            template.apply {
-                id = "identity#verifiableID#${UUID.randomUUID()}"
-                issuer = proofConfig.issuerDid
-                credentialSubject?.apply {
-                    givenName = "John"
-                    birthDate = "1958-08-17"
+    override fun populate(credentialBuilder: W3CCredentialBuilder, proofConfig: ProofConfig): W3CCredentialBuilder {
+        return when (credentialBuilder.type[0]) {
+            "CustomCredential" -> {
+                credentialBuilder.setId("identity#verifiableID#${UUID.randomUUID()}")
+                credentialBuilder.setIssuer(proofConfig.issuerDid)
+                credentialBuilder.buildSubject {
+                    setProperty("givenName", "John")
+                    setProperty("birthDate", "1958-08-17")
                 }
             }
-            return template
-        } else {
-            throw IllegalArgumentException("Only VerifiableId is supported by this data provider")
+
+            else -> throw IllegalArgumentException("Only VerifiableId is supported by this data provider")
         }
     }
 }

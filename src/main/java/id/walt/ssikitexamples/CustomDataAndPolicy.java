@@ -4,18 +4,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import id.walt.auditor.Auditor;
 import id.walt.auditor.JsonSchemaPolicy;
 import id.walt.auditor.SignaturePolicy;
-import id.walt.auditor.VerificationPolicy;
+import id.walt.auditor.SimpleVerificationPolicy;
+import id.walt.credentials.w3c.VerifiableCredential;
+import id.walt.credentials.w3c.W3CIssuer;
+import id.walt.credentials.w3c.builder.W3CCredentialBuilder;
 import id.walt.custodian.Custodian;
 import id.walt.servicematrix.ServiceMatrix;
 import id.walt.signatory.*;
-import id.walt.vclib.credentials.VerifiableId;
-import id.walt.vclib.credentials.VerifiablePresentation;
-import id.walt.vclib.model.VerifiableCredential;
+import kotlin.Unit;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
@@ -39,15 +42,12 @@ public class CustomDataAndPolicy {
         var holder = idIter.next();
         var issuer = idIter.next();
 
-        // Register custom data provider
-        DataProviderRegistry.INSTANCE.register(kotlin.jvm.JvmClassMappingKt.getKotlinClass(VerifiableId.class), new IdDataCustomProvider());
-
         // Issue VC in JSON-LD and JWT format
-        var vcJsonLd = signatory.issue("VerifiableId", createProofConfig(issuer.getDid(), holder.getDid(), ProofType.LD_PROOF, holder.getPersonalIdentifier()), null);
+        var vcJsonLd = signatory.issue("VerifiableId", createProofConfig(issuer.getDid(), holder.getDid(), ProofType.LD_PROOF, holder.getPersonalIdentifier()), new IdDataCustomProvider(), null, false);
         System.out.println("\n------------------------------- VC in JSON-LD format -------------------------------");
         System.out.println(vcJsonLd);
 
-        var vcJwt = signatory.issue("VerifiableId", createProofConfig(issuer.getDid(), holder.getDid(), ProofType.JWT, holder.getPersonalIdentifier()), null);
+        var vcJwt = signatory.issue("VerifiableId", createProofConfig(issuer.getDid(), holder.getDid(), ProofType.JWT, holder.getPersonalIdentifier()), new IdDataCustomProvider(), null, false);
         System.out.println("\n------------------------------- VC in JWT format -------------------------------");
         System.out.println(vcJwt);
 
@@ -74,7 +74,7 @@ public class CustomDataAndPolicy {
     }
 }
 
-class CustomPolicy extends VerificationPolicy {
+class CustomPolicy extends SimpleVerificationPolicy {
 
     private String description = "A custom verification policy";
 
@@ -86,15 +86,10 @@ class CustomPolicy extends VerificationPolicy {
 
     @Override
     protected boolean doVerify(@NotNull VerifiableCredential vc) {
-        if (vc instanceof VerifiableId) {
-            var idData = MockedIdDatabase.INSTANCE.get(((VerifiableId) vc).getCredentialSubject().getPersonalIdentifier());
-            if (idData != null) {
-                return idData.getFamilyName().equals(((VerifiableId) vc).getCredentialSubject().getFamilyName())
-                        && idData.getFirstName().equals(((VerifiableId) vc).getCredentialSubject().getFirstName());
-            }
-        } else if (vc instanceof VerifiablePresentation) {
-            // This custom policy does not verify the VerifiablePresentation
-            return true;
+        var idData = MockedIdDatabase.INSTANCE.get((String) vc.getCredentialSubject().getProperties().get("personalIdentifier"));
+        if (idData != null) {
+            return idData.getFamilyName().equals(vc.getCredentialSubject().getProperties().get("familyName"))
+                    && idData.getFirstName().equals(vc.getCredentialSubject().getProperties().get("firstName"));
         }
 
         return false;
@@ -108,42 +103,40 @@ class IdDataCustomProvider implements SignatoryDataProvider {
 
     @NotNull
     @Override
-    public VerifiableCredential populate(@NotNull VerifiableCredential template, @NotNull ProofConfig proofConfig) {
-        if (template instanceof VerifiableId) {
-            // get ID data for the given subject
+    public W3CCredentialBuilder populate(@NotNull W3CCredentialBuilder credentialBuilder, @NotNull ProofConfig proofConfig) {
+        if (credentialBuilder.getType().get(0).equals("VerifiableId")) {
+
             var idData = ofNullable(proofConfig.getDataProviderIdentifier())
                     .map(MockedIdDatabase.INSTANCE::get)
                     .orElseThrow(() -> new RuntimeException("No ID data found for the given data-provider identifier"));
 
-            return updateCustomVerifiableCredential(template, proofConfig, idData);
+            return updateCustomVerifiableCredential(credentialBuilder, proofConfig, idData);
         } else {
             throw new IllegalArgumentException("Only VerifiableId is supported by this data provider");
         }
     }
 
-    private VerifiableCredential updateCustomVerifiableCredential(VerifiableCredential vc, ProofConfig proofConfig, IdData idData) {
-        vc.setId("identity#verifiableID#" + UUID.randomUUID());
-        vc.setIssuer(proofConfig.getIssuerDid());
-        ofNullable(proofConfig.getIssueDate()).ifPresent(issueDate -> vc.setIssuanceDate(dateFormat.format(issueDate)));
-        ofNullable(proofConfig.getExpirationDate()).ifPresent(expirationDate -> vc.setExpirationDate(dateFormat.format(expirationDate)));
-        vc.setValidFrom(vc.getIssuanceDate());
-        ((VerifiableId) vc).getEvidence().get(0).setVerifier(proofConfig.getIssuerDid());
-        ((VerifiableId) vc).setCredentialSubject(createCredentialSubject(idData));
+    private W3CCredentialBuilder updateCustomVerifiableCredential(W3CCredentialBuilder credentialBuilder, ProofConfig proofConfig, IdData idData) {
+        credentialBuilder.setId("identity#verifiableID#" + UUID.randomUUID());
+        credentialBuilder.setIssuer(new W3CIssuer(proofConfig.getIssuerDid()));
+        ofNullable(proofConfig.getIssueDate()).ifPresent(issueDate -> credentialBuilder.setIssuanceDate(Instant.parse(dateFormat.format(issueDate))));
+        ofNullable(proofConfig.getExpirationDate()).ifPresent(expirationDate -> credentialBuilder.setExpirationDate(Instant.parse(dateFormat.format(expirationDate))));
+        credentialBuilder.setValidFrom(proofConfig.getIssueDate());
+        credentialBuilder.setProperty("evidence", Map.of(
+                "verifier", proofConfig.getIssuerDid()
+        ));
+        return credentialBuilder.buildSubject(subjectBuilder -> {
+            subjectBuilder.setId(idData.getDid());
+            subjectBuilder.setProperty("familyName", idData.getFamilyName());
+            subjectBuilder.setProperty("firstName", idData.getFirstName());
+            subjectBuilder.setProperty("dateOfBirth", idData.getDateOfBirth());
+            subjectBuilder.setProperty("personalIdentifier", idData.getPersonalIdentifier());
+            subjectBuilder.setProperty("nameAndFamilyNameAtBirth", idData.getNameAndFamilyNameAtBirth());
+            subjectBuilder.setProperty("placeOfBirth", idData.getPlaceOfBirth());
+            subjectBuilder.setProperty("currentAddress", Collections.singletonList(idData.getCurrentAddress()));
+            subjectBuilder.setProperty("gender", idData.getGender());
 
-        return vc;
-    }
-
-    private VerifiableId.VerifiableIdSubject createCredentialSubject(IdData idData) {
-        return new VerifiableId.VerifiableIdSubject(
-                idData.getDid(),
-                null,
-                idData.getFamilyName(),
-                idData.getFirstName(),
-                idData.getDateOfBirth(),
-                idData.getPersonalIdentifier(),
-                idData.getNameAndFamilyNameAtBirth(),
-                idData.getPlaceOfBirth(),
-                Collections.singletonList(idData.getCurrentAddress()),
-                idData.getGender());
+            return Unit.INSTANCE;
+        });
     }
 }
