@@ -1,10 +1,7 @@
 package id.walt.ssikitexamples;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import id.walt.auditor.Auditor;
-import id.walt.auditor.JsonSchemaPolicy;
-import id.walt.auditor.SignaturePolicy;
-import id.walt.auditor.SimpleVerificationPolicy;
+import id.walt.auditor.*;
 import id.walt.credentials.w3c.VerifiableCredential;
 import id.walt.credentials.w3c.W3CIssuer;
 import id.walt.credentials.w3c.builder.W3CCredentialBuilder;
@@ -51,6 +48,13 @@ public class CustomDataAndPolicy {
         System.out.println("\n------------------------------- VC in JWT format -------------------------------");
         System.out.println(vcJwt);
 
+        // Verify VPs, using Signature, JsonSchema and a custom policy
+        var resVcJsonLd = Auditor.Companion.getService().verify(vcJsonLd, List.of(new SignaturePolicy(), new JsonSchemaPolicy(), new CustomPolicy()));
+        var resVcJwt = Auditor.Companion.getService().verify(vcJwt, List.of(new SignaturePolicy(), new JsonSchemaPolicy(), new CustomPolicy()));
+
+        System.out.println("JSON verification result: " + resVcJsonLd.getResult());
+        System.out.println("JWT verification result: " + resVcJwt.getResult());
+
         // Present VC in JSON-LD and JWT format
         var vpJsonLd = custodian.createPresentation(List.of(vcJsonLd), holder.getDid(), null, null, null, null);
         System.out.println("------------------------------- VP in JSON-LD format -------------------------------");
@@ -64,8 +68,8 @@ public class CustomDataAndPolicy {
         var resJsonLd = Auditor.Companion.getService().verify(vpJsonLd, List.of(new SignaturePolicy(), new JsonSchemaPolicy(), new CustomPolicy()));
         var resJwt = Auditor.Companion.getService().verify(vpJwt, List.of(new SignaturePolicy(), new JsonSchemaPolicy(), new CustomPolicy()));
 
-        System.out.println("JSON verification result: " + resJsonLd.getValid());
-        System.out.println("JWT verification result: " + resJwt.getValid());
+        System.out.println("JSON verification result: " + resJsonLd.getResult());
+        System.out.println("JWT verification result: " + resJwt.getResult());
     }
 
     public ProofConfig createProofConfig(String issuerDid, String subjectDid, ProofType proofType, String dataProviderIdentifier) {
@@ -84,15 +88,24 @@ class CustomPolicy extends SimpleVerificationPolicy {
         return description;
     }
 
+    @NotNull
     @Override
-    protected boolean doVerify(@NotNull VerifiableCredential vc) {
-        var idData = MockedIdDatabase.INSTANCE.get((String) vc.getCredentialSubject().getProperties().get("personalIdentifier"));
-        if (idData != null) {
-            return idData.getFamilyName().equals(vc.getCredentialSubject().getProperties().get("familyName"))
-                    && idData.getFirstName().equals(vc.getCredentialSubject().getProperties().get("firstName"));
+    protected VerificationPolicyResult doVerify(@NotNull VerifiableCredential vc) {
+        IdData idData = null;
+        var result = false;
+        if (vc.getType().get(vc.getType().size() - 1).equals("VerifiableId")) {
+            if (vc.getCredentialSubject() != null) {
+                idData = MockedIdDatabase.INSTANCE.get((String) vc.getCredentialSubject().getProperties().get("personalIdentifier"));
+            }
+            if (idData != null) {
+                result = idData.getFamilyName().equals(vc.getCredentialSubject().getProperties().get("familyName"))
+                        && idData.getFirstName().equals(vc.getCredentialSubject().getProperties().get("firstName"));
+            }
+        } else if (vc.getType().get(vc.getType().size() - 1).equals("VerifiablePresentation")) {
+            // This custom policy does not verify the VerifiablePresentation
+            result = true;
         }
-
-        return false;
+        return result ? VerificationPolicyResult.Companion.success() : VerificationPolicyResult.Companion.failure(new Exception(""));
     }
 }
 
@@ -104,7 +117,7 @@ class IdDataCustomProvider implements SignatoryDataProvider {
     @NotNull
     @Override
     public W3CCredentialBuilder populate(@NotNull W3CCredentialBuilder credentialBuilder, @NotNull ProofConfig proofConfig) {
-        if (credentialBuilder.getType().get(0).equals("VerifiableId")) {
+        if (credentialBuilder.getType().get(credentialBuilder.getType().size() - 1).equals("VerifiableId")) {
 
             var idData = ofNullable(proofConfig.getDataProviderIdentifier())
                     .map(MockedIdDatabase.INSTANCE::get)
@@ -117,26 +130,32 @@ class IdDataCustomProvider implements SignatoryDataProvider {
     }
 
     private W3CCredentialBuilder updateCustomVerifiableCredential(W3CCredentialBuilder credentialBuilder, ProofConfig proofConfig, IdData idData) {
-        credentialBuilder.setId("identity#verifiableID#" + UUID.randomUUID());
-        credentialBuilder.setIssuer(new W3CIssuer(proofConfig.getIssuerDid()));
-        ofNullable(proofConfig.getIssueDate()).ifPresent(issueDate -> credentialBuilder.setIssuanceDate(Instant.parse(dateFormat.format(issueDate))));
-        ofNullable(proofConfig.getExpirationDate()).ifPresent(expirationDate -> credentialBuilder.setExpirationDate(Instant.parse(dateFormat.format(expirationDate))));
-        credentialBuilder.setValidFrom(proofConfig.getIssueDate());
-        credentialBuilder.setProperty("evidence", Map.of(
-                "verifier", proofConfig.getIssuerDid()
-        ));
-        return credentialBuilder.buildSubject(subjectBuilder -> {
-            subjectBuilder.setId(idData.getDid());
-            subjectBuilder.setProperty("familyName", idData.getFamilyName());
-            subjectBuilder.setProperty("firstName", idData.getFirstName());
-            subjectBuilder.setProperty("dateOfBirth", idData.getDateOfBirth());
-            subjectBuilder.setProperty("personalIdentifier", idData.getPersonalIdentifier());
-            subjectBuilder.setProperty("nameAndFamilyNameAtBirth", idData.getNameAndFamilyNameAtBirth());
-            subjectBuilder.setProperty("placeOfBirth", idData.getPlaceOfBirth());
-            subjectBuilder.setProperty("currentAddress", Collections.singletonList(idData.getCurrentAddress()));
-            subjectBuilder.setProperty("gender", idData.getGender());
+        return credentialBuilder
+                .setId("identity#verifiableID#" + UUID.randomUUID())
+                .setIssuer(new W3CIssuer(proofConfig.getIssuerDid()))
+                .setProperty("evidence", List.of(Map.of(
+                        "verifier", proofConfig.getIssuerDid())
+                ))
+                .buildSubject(subjectBuilder -> {
+                    subjectBuilder.setId(idData.getDid());
+                    subjectBuilder.setProperty("familyName", idData.getFamilyName());
+                    subjectBuilder.setProperty("firstName", idData.getFirstName());
+                    subjectBuilder.setProperty("dateOfBirth", idData.getDateOfBirth());
+                    subjectBuilder.setProperty("personalIdentifier", idData.getPersonalIdentifier());
+                    subjectBuilder.setProperty("nameAndFamilyNameAtBirth", idData.getNameAndFamilyNameAtBirth());
+                    subjectBuilder.setProperty("placeOfBirth", idData.getPlaceOfBirth());
+                    subjectBuilder.setProperty("currentAddress", Collections.singletonList(idData.getCurrentAddress()));
+                    subjectBuilder.setProperty("gender", idData.getGender());
 
-            return Unit.INSTANCE;
-        });
+                    return Unit.INSTANCE;
+                }).setIssuanceDate(
+                        proofConfig.getIssueDate() != null ? Instant.parse(dateFormat.format(proofConfig.getIssueDate())) : Instant.now()
+                )
+                .setExpirationDate(
+                        proofConfig.getExpirationDate() != null ? Instant.parse(dateFormat.format(proofConfig.getExpirationDate())) : Instant.now()
+                )
+                .setValidFrom(
+                        proofConfig.getIssueDate() != null ? Instant.parse(dateFormat.format(proofConfig.getExpirationDate())) : Instant.now()
+                );
     }
 }

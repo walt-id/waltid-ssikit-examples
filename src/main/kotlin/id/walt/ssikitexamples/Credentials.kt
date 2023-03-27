@@ -41,8 +41,8 @@ fun credentials() {
     val resJsonLd = Auditor.getService().verify(vpJsonLd, listOf(SignaturePolicy(), JsonSchemaPolicy()))
     val resJwt = Auditor.getService().verify(vpJwt, listOf(SignaturePolicy(), JsonSchemaPolicy()))
 
-    println("JSON-LD verification result: ${resJsonLd.valid}")
-    println("JWT verification result: ${resJwt.valid}")
+    println("JSON-LD verification result: ${resJsonLd.result}")
+    println("JWT verification result: ${resJwt.result}")
 }
 
 

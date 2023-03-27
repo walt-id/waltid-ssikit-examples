@@ -4,7 +4,7 @@ import com.google.common.io.Resources.getResource
 import id.walt.common.prettyPrint
 import id.walt.credentials.w3c.VerifiableCredential
 import id.walt.credentials.w3c.W3CCredentialSubject
-import id.walt.credentials.w3c.templates.VcTemplateManager
+import id.walt.credentials.w3c.templates.VcTemplateService
 import id.walt.credentials.w3c.toVerifiableCredential
 import id.walt.servicematrix.ServiceMatrix
 
@@ -20,7 +20,7 @@ fun customCredential() {
     val myCustomCredential = VerifiableCredential.fromJson(customCredentialData)
 
     // Registering a custom credential template
-    VcTemplateManager.register(customCredentialData::class.java.name, myCustomCredential)
+    VcTemplateService.getService().register(customCredentialData::class.java.name, myCustomCredential)
 
     println("This is my custom credential: $myCustomCredential")
 

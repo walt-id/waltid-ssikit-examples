@@ -1,10 +1,7 @@
 package id.walt.ssikitexamples
 
 import com.beust.klaxon.Json
-import id.walt.auditor.Auditor
-import id.walt.auditor.JsonSchemaPolicy
-import id.walt.auditor.SignaturePolicy
-import id.walt.auditor.SimpleVerificationPolicy
+import id.walt.auditor.*
 import id.walt.credentials.w3c.VerifiableCredential
 import id.walt.credentials.w3c.builder.W3CCredentialBuilder
 import id.walt.custodian.Custodian
@@ -52,6 +49,13 @@ fun customDataAndPolicy() {
     println("\n------------------------------- VC in JWT format -------------------------------")
     println(vcJwt)
 
+    // Verify VPs, using Signature, JsonSchema and a custom policy
+    val resVcJson = Auditor.getService().verify(vcJsonLd, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
+    val resVcJwt = Auditor.getService().verify(vcJwt, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
+
+    println("JSON verification result: ${resVcJson.result}")
+    println("JWT verification result: ${resVcJwt.result}")
+
     // Present VC in JSON-LD and JWT format
     val vpJson = custodian.createPresentation(listOf(vcJsonLd), holder.did, null, null, null, null)
     println("------------------------------- VP in JSON_LD format -------------------------------")
@@ -64,8 +68,8 @@ fun customDataAndPolicy() {
     val resJson = Auditor.getService().verify(vpJson, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
     val resJwt = Auditor.getService().verify(vpJwt, listOf(SignaturePolicy(), JsonSchemaPolicy(), MyCustomPolicy()))
 
-    println("JSON verification result: ${resJson.valid}")
-    println("JWT verification result: ${resJwt.valid}")
+    println("JSON verification result: ${resJson.result}")
+    println("JWT verification result: ${resJwt.result}")
 }
 
 
@@ -74,14 +78,18 @@ class MyCustomPolicy : SimpleVerificationPolicy() {
     override val description: String
         get() = "A custom verification policy"
 
-    override fun doVerify(vc: VerifiableCredential): Boolean {
-        return when (vc.type[0]) {
-            "VerifiableCredential" -> MockedIdDatabase.get(vc.credentialSubject!!.properties["personalIdentifier"] as String)
-                ?.let {
+    override fun doVerify(vc: VerifiableCredential): VerificationPolicyResult {
+        return when (vc.type.last()) {
+            "VerifiableId" -> MockedIdDatabase.get(vc.credentialSubject!!.properties["personalIdentifier"] as String)
+                ?.takeIf {
                     it.familyName == vc.credentialSubject!!.properties["familyName"] && it.firstName == vc.credentialSubject!!.properties["firstName"]
-                } ?: false
-            "VerifiablePresentation" -> true
-            else -> false
+                }?.let { VerificationPolicyResult.success() } ?: VerificationPolicyResult.failure(Exception(""))
+
+            "VerifiablePresentation" -> {
+                // This custom policy does not verify the VerifiablePresentation
+                VerificationPolicyResult.success()
+            }
+            else -> VerificationPolicyResult.failure(IllegalArgumentException(""))
         }
     }
 }
@@ -97,17 +105,11 @@ class CustomIdDataProvider : SignatoryDataProvider {
             "VerifiableId" -> {
                 credentialBuilder.setId("identity#verifiableID#${UUID.randomUUID()}")
                     .setIssuer(proofConfig.issuerDid)
-                    .setIssuanceDate(if (proofConfig.issueDate != null) Instant.parse(dateFormat.format(proofConfig.issueDate)) else Instant.now())
-                    .setExpirationDate(
-                        if (proofConfig.expirationDate != null) Instant.parse(
-                            dateFormat.format(
-                                proofConfig.expirationDate
-                            )
-                        ) else Instant.now()
-                    )
-                    .setValidFrom(if (proofConfig.issueDate != null) Instant.parse(dateFormat.format(proofConfig.issueDate)) else Instant.now())
-                    .setProperty("evidence", buildMap {
-                        put("verifier", proofConfig.issuerDid)
+                    .setIssuanceDate(proofConfig.issueDate?.let { Instant.parse(dateFormat.format(it)) } ?: Instant.now())
+                    .setExpirationDate(proofConfig.expirationDate?.let { Instant.parse(dateFormat.format(it)) } ?: Instant.now())
+                    .setValidFrom(proofConfig.issueDate?.let { Instant.parse(dateFormat.format(it)) } ?: Instant.now())
+                    .setProperty("evidence", buildList {
+                        add(mapOf("verifier" to proofConfig.issuerDid))
                     }).buildSubject {
                         // get ID data for the given subject
                         val idData = MockedIdDatabase.get(proofConfig.dataProviderIdentifier!!)

@@ -45,8 +45,8 @@ public class Credentials {
         var resJsonLd = Auditor.Companion.getService().verify(vpJsonLd, List.of(new SignaturePolicy(), new JsonSchemaPolicy()));
         var resJwt = Auditor.Companion.getService().verify(vpJwt, List.of(new SignaturePolicy(), new JsonSchemaPolicy()));
 
-        System.out.println("JSON-LD verification result: " + resJsonLd.getValid());
-        System.out.println("JWT verification result: " + resJwt.getValid());
+        System.out.println("JSON-LD verification result: " + resJsonLd.getResult());
+        System.out.println("JWT verification result: " + resJwt.getResult());
     }
 
     public ProofConfig createProofConfig(String issuerDid, String subjectDid, ProofType proofType, Instant expiration) {

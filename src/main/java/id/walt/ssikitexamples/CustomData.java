@@ -2,7 +2,7 @@ package id.walt.ssikitexamples;
 
 import id.walt.credentials.w3c.builder.W3CCredentialBuilder;
 import id.walt.credentials.w3c.templates.VcTemplate;
-import id.walt.credentials.w3c.templates.VcTemplateManager;
+import id.walt.credentials.w3c.templates.VcTemplateService;
 import id.walt.crypto.KeyAlgorithm;
 import id.walt.model.DidMethod;
 import id.walt.servicematrix.ServiceMatrix;
@@ -48,7 +48,7 @@ public class CustomData {
         });
 
         // Create VC template
-        var verifiableDiplomaTemplate = VcTemplateManager.INSTANCE.getTemplate("VerifiableDiploma", true, "");
+        var verifiableDiplomaTemplate = VcTemplateService.Companion.getService().getTemplate("VerifiableDiploma", true, "");
         System.out.println("Default Verifiable Diploma - " + verifiableDiplomaTemplate);
 
         // Prepare desired custom data that should replace the default template data

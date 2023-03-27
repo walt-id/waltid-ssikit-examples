@@ -2,7 +2,7 @@ package id.walt.ssikitexamples
 
 import id.walt.common.prettyPrint
 import id.walt.credentials.w3c.builder.W3CCredentialBuilder
-import id.walt.credentials.w3c.templates.VcTemplateManager
+import id.walt.credentials.w3c.templates.VcTemplateService
 import id.walt.crypto.KeyAlgorithm
 import id.walt.model.DidMethod
 import id.walt.servicematrix.ServiceMatrix
@@ -41,7 +41,7 @@ fun customData() {
     }
 
     // Load a VC template
-    val verifiableDiplomaTemplate = VcTemplateManager.getTemplate("VerifiableDiploma")
+    val verifiableDiplomaTemplate = VcTemplateService.getService().getTemplate("VerifiableDiploma")
     println("Default Verifiable Diploma - " + verifiableDiplomaTemplate.prettyPrint())
 
     // Prepare desired custom data that should replace the default template data
