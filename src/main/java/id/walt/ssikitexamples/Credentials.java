@@ -33,8 +33,8 @@ public class Credentials {
         var expiration = Instant.now().plus(30, ChronoUnit.DAYS);
 
         // Issue VC in JSON-LD and JWT format (for show-casing both formats)
-        var vcJsonLd = Signatory.Companion.getService().issue("VerifiableId", createProofConfig(issuerDid, holderDid, ProofType.LD_PROOF, expiration), null);
-        var vcJwt = Signatory.Companion.getService().issue("VerifiableId", createProofConfig(issuerDid, holderDid, ProofType.JWT, expiration), null);
+        var vcJsonLd = Signatory.Companion.getService().issue("VerifiableId", createProofConfig(issuerDid, holderDid, ProofType.LD_PROOF, expiration), null, null, false);
+        var vcJwt = Signatory.Companion.getService().issue("VerifiableId", createProofConfig(issuerDid, holderDid, ProofType.JWT, expiration), null, null, false);
 
         // Present VC in JSON-LD and JWT format (for show-casing both formats)
         // expiration date is not needed when JSON-LD format
@@ -45,12 +45,12 @@ public class Credentials {
         var resJsonLd = Auditor.Companion.getService().verify(vpJsonLd, List.of(new SignaturePolicy(), new JsonSchemaPolicy()));
         var resJwt = Auditor.Companion.getService().verify(vpJwt, List.of(new SignaturePolicy(), new JsonSchemaPolicy()));
 
-        System.out.println("JSON-LD verification result: " + resJsonLd.getValid());
-        System.out.println("JWT verification result: " + resJwt.getValid());
+        System.out.println("JSON-LD verification result: " + resJsonLd.getResult());
+        System.out.println("JWT verification result: " + resJwt.getResult());
     }
 
     public ProofConfig createProofConfig(String issuerDid, String subjectDid, ProofType proofType, Instant expiration) {
-        return new ProofConfig(issuerDid, subjectDid, null, null, proofType, null, null,
+        return new ProofConfig(issuerDid = issuerDid, subjectDid = subjectDid, null, null, proofType, null, null,
                 null, null, null, null, expiration, null, null, null, Ecosystem.DEFAULT);
     }
 }

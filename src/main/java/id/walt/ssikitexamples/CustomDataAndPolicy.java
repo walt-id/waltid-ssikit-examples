@@ -1,21 +1,21 @@
 package id.walt.ssikitexamples;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import id.walt.auditor.Auditor;
-import id.walt.auditor.JsonSchemaPolicy;
-import id.walt.auditor.SignaturePolicy;
-import id.walt.auditor.VerificationPolicy;
+import id.walt.auditor.*;
+import id.walt.credentials.w3c.VerifiableCredential;
+import id.walt.credentials.w3c.W3CIssuer;
+import id.walt.credentials.w3c.builder.W3CCredentialBuilder;
 import id.walt.custodian.Custodian;
 import id.walt.servicematrix.ServiceMatrix;
 import id.walt.signatory.*;
-import id.walt.vclib.credentials.VerifiableId;
-import id.walt.vclib.credentials.VerifiablePresentation;
-import id.walt.vclib.model.VerifiableCredential;
+import kotlin.Unit;
 import org.jetbrains.annotations.NotNull;
 
+import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static java.util.Optional.ofNullable;
@@ -39,17 +39,21 @@ public class CustomDataAndPolicy {
         var holder = idIter.next();
         var issuer = idIter.next();
 
-        // Register custom data provider
-        DataProviderRegistry.INSTANCE.register(kotlin.jvm.JvmClassMappingKt.getKotlinClass(VerifiableId.class), new IdDataCustomProvider());
-
         // Issue VC in JSON-LD and JWT format
-        var vcJsonLd = signatory.issue("VerifiableId", createProofConfig(issuer.getDid(), holder.getDid(), ProofType.LD_PROOF, holder.getPersonalIdentifier()), null);
+        var vcJsonLd = signatory.issue("VerifiableId", createProofConfig(issuer.getDid(), holder.getDid(), ProofType.LD_PROOF, holder.getPersonalIdentifier()), new IdDataCustomProvider(), null, false);
         System.out.println("\n------------------------------- VC in JSON-LD format -------------------------------");
         System.out.println(vcJsonLd);
 
-        var vcJwt = signatory.issue("VerifiableId", createProofConfig(issuer.getDid(), holder.getDid(), ProofType.JWT, holder.getPersonalIdentifier()), null);
+        var vcJwt = signatory.issue("VerifiableId", createProofConfig(issuer.getDid(), holder.getDid(), ProofType.JWT, holder.getPersonalIdentifier()), new IdDataCustomProvider(), null, false);
         System.out.println("\n------------------------------- VC in JWT format -------------------------------");
         System.out.println(vcJwt);
+
+        // Verify VPs, using Signature, JsonSchema and a custom policy
+        var resVcJsonLd = Auditor.Companion.getService().verify(vcJsonLd, List.of(new SignaturePolicy(), new JsonSchemaPolicy(), new CustomPolicy()));
+        var resVcJwt = Auditor.Companion.getService().verify(vcJwt, List.of(new SignaturePolicy(), new JsonSchemaPolicy(), new CustomPolicy()));
+
+        System.out.println("JSON verification result: " + resVcJsonLd.getResult());
+        System.out.println("JWT verification result: " + resVcJwt.getResult());
 
         // Present VC in JSON-LD and JWT format
         var vpJsonLd = custodian.createPresentation(List.of(vcJsonLd), holder.getDid(), null, null, null, null);
@@ -64,8 +68,8 @@ public class CustomDataAndPolicy {
         var resJsonLd = Auditor.Companion.getService().verify(vpJsonLd, List.of(new SignaturePolicy(), new JsonSchemaPolicy(), new CustomPolicy()));
         var resJwt = Auditor.Companion.getService().verify(vpJwt, List.of(new SignaturePolicy(), new JsonSchemaPolicy(), new CustomPolicy()));
 
-        System.out.println("JSON verification result: " + resJsonLd.getValid());
-        System.out.println("JWT verification result: " + resJwt.getValid());
+        System.out.println("JSON verification result: " + resJsonLd.getResult());
+        System.out.println("JWT verification result: " + resJwt.getResult());
     }
 
     public ProofConfig createProofConfig(String issuerDid, String subjectDid, ProofType proofType, String dataProviderIdentifier) {
@@ -74,7 +78,7 @@ public class CustomDataAndPolicy {
     }
 }
 
-class CustomPolicy extends VerificationPolicy {
+class CustomPolicy extends SimpleVerificationPolicy {
 
     private String description = "A custom verification policy";
 
@@ -84,20 +88,24 @@ class CustomPolicy extends VerificationPolicy {
         return description;
     }
 
+    @NotNull
     @Override
-    protected boolean doVerify(@NotNull VerifiableCredential vc) {
-        if (vc instanceof VerifiableId) {
-            var idData = MockedIdDatabase.INSTANCE.get(((VerifiableId) vc).getCredentialSubject().getPersonalIdentifier());
-            if (idData != null) {
-                return idData.getFamilyName().equals(((VerifiableId) vc).getCredentialSubject().getFamilyName())
-                        && idData.getFirstName().equals(((VerifiableId) vc).getCredentialSubject().getFirstName());
+    protected VerificationPolicyResult doVerify(@NotNull VerifiableCredential vc) {
+        IdData idData = null;
+        var result = false;
+        if (vc.getType().get(vc.getType().size() - 1).equals("VerifiableId")) {
+            if (vc.getCredentialSubject() != null) {
+                idData = MockedIdDatabase.INSTANCE.get((String) vc.getCredentialSubject().getProperties().get("personalIdentifier"));
             }
-        } else if (vc instanceof VerifiablePresentation) {
+            if (idData != null) {
+                result = idData.getFamilyName().equals(vc.getCredentialSubject().getProperties().get("familyName"))
+                        && idData.getFirstName().equals(vc.getCredentialSubject().getProperties().get("firstName"));
+            }
+        } else if (vc.getType().get(vc.getType().size() - 1).equals("VerifiablePresentation")) {
             // This custom policy does not verify the VerifiablePresentation
-            return true;
+            result = true;
         }
-
-        return false;
+        return result ? VerificationPolicyResult.Companion.success() : VerificationPolicyResult.Companion.failure(new Exception(""));
     }
 }
 
@@ -108,42 +116,46 @@ class IdDataCustomProvider implements SignatoryDataProvider {
 
     @NotNull
     @Override
-    public VerifiableCredential populate(@NotNull VerifiableCredential template, @NotNull ProofConfig proofConfig) {
-        if (template instanceof VerifiableId) {
-            // get ID data for the given subject
+    public W3CCredentialBuilder populate(@NotNull W3CCredentialBuilder credentialBuilder, @NotNull ProofConfig proofConfig) {
+        if (credentialBuilder.getType().get(credentialBuilder.getType().size() - 1).equals("VerifiableId")) {
+
             var idData = ofNullable(proofConfig.getDataProviderIdentifier())
                     .map(MockedIdDatabase.INSTANCE::get)
                     .orElseThrow(() -> new RuntimeException("No ID data found for the given data-provider identifier"));
 
-            return updateCustomVerifiableCredential(template, proofConfig, idData);
+            return updateCustomVerifiableCredential(credentialBuilder, proofConfig, idData);
         } else {
             throw new IllegalArgumentException("Only VerifiableId is supported by this data provider");
         }
     }
 
-    private VerifiableCredential updateCustomVerifiableCredential(VerifiableCredential vc, ProofConfig proofConfig, IdData idData) {
-        vc.setId("identity#verifiableID#" + UUID.randomUUID());
-        vc.setIssuer(proofConfig.getIssuerDid());
-        ofNullable(proofConfig.getIssueDate()).ifPresent(issueDate -> vc.setIssuanceDate(dateFormat.format(issueDate)));
-        ofNullable(proofConfig.getExpirationDate()).ifPresent(expirationDate -> vc.setExpirationDate(dateFormat.format(expirationDate)));
-        vc.setValidFrom(vc.getIssuanceDate());
-        ((VerifiableId) vc).getEvidence().get(0).setVerifier(proofConfig.getIssuerDid());
-        ((VerifiableId) vc).setCredentialSubject(createCredentialSubject(idData));
+    private W3CCredentialBuilder updateCustomVerifiableCredential(W3CCredentialBuilder credentialBuilder, ProofConfig proofConfig, IdData idData) {
+        return credentialBuilder
+                .setId("identity#verifiableID#" + UUID.randomUUID())
+                .setIssuer(new W3CIssuer(proofConfig.getIssuerDid()))
+                .setProperty("evidence", List.of(Map.of(
+                        "verifier", proofConfig.getIssuerDid())
+                ))
+                .buildSubject(subjectBuilder -> {
+                    subjectBuilder.setId(idData.getDid());
+                    subjectBuilder.setProperty("familyName", idData.getFamilyName());
+                    subjectBuilder.setProperty("firstName", idData.getFirstName());
+                    subjectBuilder.setProperty("dateOfBirth", idData.getDateOfBirth());
+                    subjectBuilder.setProperty("personalIdentifier", idData.getPersonalIdentifier());
+                    subjectBuilder.setProperty("nameAndFamilyNameAtBirth", idData.getNameAndFamilyNameAtBirth());
+                    subjectBuilder.setProperty("placeOfBirth", idData.getPlaceOfBirth());
+                    subjectBuilder.setProperty("currentAddress", Collections.singletonList(idData.getCurrentAddress()));
+                    subjectBuilder.setProperty("gender", idData.getGender());
 
-        return vc;
-    }
-
-    private VerifiableId.VerifiableIdSubject createCredentialSubject(IdData idData) {
-        return new VerifiableId.VerifiableIdSubject(
-                idData.getDid(),
-                null,
-                idData.getFamilyName(),
-                idData.getFirstName(),
-                idData.getDateOfBirth(),
-                idData.getPersonalIdentifier(),
-                idData.getNameAndFamilyNameAtBirth(),
-                idData.getPlaceOfBirth(),
-                Collections.singletonList(idData.getCurrentAddress()),
-                idData.getGender());
+                    return Unit.INSTANCE;
+                }).setIssuanceDate(
+                        proofConfig.getIssueDate() != null ? Instant.parse(dateFormat.format(proofConfig.getIssueDate())) : Instant.now()
+                )
+                .setExpirationDate(
+                        proofConfig.getExpirationDate() != null ? Instant.parse(dateFormat.format(proofConfig.getExpirationDate())) : Instant.now()
+                )
+                .setValidFrom(
+                        proofConfig.getIssueDate() != null ? Instant.parse(dateFormat.format(proofConfig.getExpirationDate())) : Instant.now()
+                );
     }
 }

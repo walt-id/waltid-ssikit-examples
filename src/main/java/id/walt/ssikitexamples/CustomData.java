@@ -1,5 +1,8 @@
 package id.walt.ssikitexamples;
 
+import id.walt.credentials.w3c.builder.W3CCredentialBuilder;
+import id.walt.credentials.w3c.templates.VcTemplate;
+import id.walt.credentials.w3c.templates.VcTemplateService;
 import id.walt.crypto.KeyAlgorithm;
 import id.walt.model.DidMethod;
 import id.walt.servicematrix.ServiceMatrix;
@@ -10,7 +13,6 @@ import id.walt.signatory.ProofConfig;
 import id.walt.signatory.ProofType;
 import id.walt.signatory.Signatory;
 import id.walt.signatory.dataproviders.MergingDataProvider;
-import id.walt.vclib.templates.VcTemplateManager;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.List;
@@ -40,14 +42,14 @@ public class CustomData {
         var issuerDid = DidService.INSTANCE.create(DidMethod.key, issuerKey.getId(), null);
 
         // List registered VC templates
-        List<String> vcTemplates = signatory.listTemplates();
+        List<VcTemplate> vcTemplates = signatory.listTemplates();
         vcTemplates.forEach(template -> {
             System.out.println(vcTemplates.indexOf(template) + ": " + template);
         });
 
         // Create VC template
-        var verifiableDiplomaTemplate = VcTemplateManager.INSTANCE.loadTemplate("VerifiableDiploma");
-        System.out.println("Default Verifiable Diploma - " + verifiableDiplomaTemplate.encodePretty());
+        var verifiableDiplomaTemplate = VcTemplateService.Companion.getService().getTemplate("VerifiableDiploma", true, "");
+        System.out.println("Default Verifiable Diploma - " + verifiableDiplomaTemplate);
 
         // Prepare desired custom data that should replace the default template data
         var data = Map.ofEntries(
@@ -56,11 +58,11 @@ public class CustomData {
 
         // Custom VC template
         var verifiableDiploma = new MergingDataProvider(data).populate(
-                verifiableDiplomaTemplate,
+                new W3CCredentialBuilder(),
                 new ProofConfig(issuerDid, holderDid, null, null, ProofType.LD_PROOF, null, null,
                         null, null, null, null, null, null, null,null, Ecosystem.DEFAULT)
-        );
-        System.out.println("Verifiable Diploma with custom data - " + verifiableDiploma.encodePretty());
+        ).build();
+        System.out.println("Verifiable Diploma with custom data - " + verifiableDiploma.encode());
 
     }
 
