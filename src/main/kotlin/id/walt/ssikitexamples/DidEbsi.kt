@@ -2,15 +2,12 @@ package id.walt.ssikitexamples
 
 import id.walt.servicematrix.ServiceMatrix
 import id.walt.crypto.KeyAlgorithm
-import id.walt.services.WaltIdServices
 import id.walt.services.key.KeyService
 import id.walt.services.did.DidService
 import id.walt.model.DidMethod
 import id.walt.services.ecosystems.essif.EssifClient
 import id.walt.services.ecosystems.essif.didebsi.DidEbsiService
 import mu.KotlinLogging
-import java.io.File 
-import id.walt.common.readEssifBearerToken
 
 fun main(){
     ebsiWorkflow()
