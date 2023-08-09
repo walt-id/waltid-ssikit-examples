@@ -20,11 +20,13 @@ repositories {
 
 dependencies {
     // walt.id
-    implementation("id.walt:waltid-ssikit:1.2303271054.0")
+    implementation("id.walt:waltid-ssikit:1.2308021811.0")
+    implementation("id.walt:waltid-sd-jwt-jvm:1.2306191408.0")
     implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.1.3")
 
     // Logging
     implementation("org.slf4j:slf4j-api:2.0.5")
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.4")
 
     // Kotlin
     implementation(kotlin("stdlib"))
