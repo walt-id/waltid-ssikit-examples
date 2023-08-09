@@ -1,7 +1,12 @@
 package id.walt.ssikitexamples
 
 import com.beust.klaxon.Json
-import id.walt.auditor.*
+import id.walt.auditor.Auditor
+import id.walt.auditor.SimpleVerificationPolicy
+import id.walt.auditor.VerificationPolicyResult
+import id.walt.auditor.policies.JsonSchemaPolicy
+import id.walt.auditor.policies.SignaturePolicy
+import id.walt.credentials.w3c.PresentableCredential
 import id.walt.credentials.w3c.VerifiableCredential
 import id.walt.credentials.w3c.builder.W3CCredentialBuilder
 import id.walt.custodian.Custodian
@@ -57,10 +62,14 @@ fun customDataAndPolicy() {
     println("JWT verification result: ${resVcJwt.result}")
 
     // Present VC in JSON-LD and JWT format
-    val vpJson = custodian.createPresentation(listOf(vcJsonLd), holder.did, null, null, null, null)
+    val vpJson = custodian.createPresentation(
+        listOf(PresentableCredential(VerifiableCredential.fromString(vcJsonLd))), holder.did, null, null, null, null
+    )
     println("------------------------------- VP in JSON_LD format -------------------------------")
     println(vpJson)
-    val vpJwt = custodian.createPresentation(listOf(vcJwt), holder.did, null, null, null, null)
+    val vpJwt = custodian.createPresentation(
+        listOf(PresentableCredential(VerifiableCredential.fromString(vcJwt))), holder.did, null, null, null, null
+    )
     println("\n------------------------------- VP in JWT format -------------------------------")
     println(vpJwt)
 

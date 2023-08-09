@@ -1,7 +1,12 @@
 package id.walt.ssikitexamples;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import id.walt.auditor.*;
+import id.walt.auditor.Auditor;
+import id.walt.auditor.SimpleVerificationPolicy;
+import id.walt.auditor.VerificationPolicyResult;
+import id.walt.auditor.policies.JsonSchemaPolicy;
+import id.walt.auditor.policies.SignaturePolicy;
+import id.walt.credentials.w3c.PresentableCredential;
 import id.walt.credentials.w3c.VerifiableCredential;
 import id.walt.credentials.w3c.W3CIssuer;
 import id.walt.credentials.w3c.builder.W3CCredentialBuilder;
@@ -56,11 +61,11 @@ public class CustomDataAndPolicy {
         System.out.println("JWT verification result: " + resVcJwt.getResult());
 
         // Present VC in JSON-LD and JWT format
-        var vpJsonLd = custodian.createPresentation(List.of(vcJsonLd), holder.getDid(), null, null, null, null);
+        var vpJsonLd = custodian.createPresentation(List.of(new PresentableCredential(VerifiableCredential.Companion.fromString(vcJsonLd), null, false)), holder.getDid(), null, null, null, null);
         System.out.println("------------------------------- VP in JSON-LD format -------------------------------");
         System.out.println(vpJsonLd);
 
-        var vpJwt = custodian.createPresentation(List.of(vcJwt), holder.getDid(), null, null, null, null);
+        var vpJwt = custodian.createPresentation(List.of(new PresentableCredential(VerifiableCredential.Companion.fromString(vcJwt), null, false)), holder.getDid(), null, null, null, null);
         System.out.println("\n------------------------------- VP in JWT format -------------------------------");
         System.out.println(vpJwt);
 
@@ -74,7 +79,8 @@ public class CustomDataAndPolicy {
 
     public ProofConfig createProofConfig(String issuerDid, String subjectDid, ProofType proofType, String dataProviderIdentifier) {
         return new ProofConfig(issuerDid, subjectDid, null, null, proofType, null, null,
-                null, null, null, null, null, dataProviderIdentifier, null , null, Ecosystem.DEFAULT  );
+                null, null, null, null, null, dataProviderIdentifier, null, null, Ecosystem.DEFAULT,
+                null, "", "", null);
     }
 }
 

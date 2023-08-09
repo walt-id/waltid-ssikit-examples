@@ -1,8 +1,10 @@
 package id.walt.ssikitexamples;
 
 import id.walt.auditor.Auditor;
-import id.walt.auditor.JsonSchemaPolicy;
-import id.walt.auditor.SignaturePolicy;
+import id.walt.auditor.policies.JsonSchemaPolicy;
+import id.walt.auditor.policies.SignaturePolicy;
+import id.walt.credentials.w3c.PresentableCredential;
+import id.walt.credentials.w3c.VerifiableCredential;
 import id.walt.custodian.Custodian;
 import id.walt.model.DidMethod;
 import id.walt.servicematrix.ServiceMatrix;
@@ -38,8 +40,8 @@ public class Credentials {
 
         // Present VC in JSON-LD and JWT format (for show-casing both formats)
         // expiration date is not needed when JSON-LD format
-        var vpJsonLd = Custodian.Companion.getService().createPresentation(List.of(vcJsonLd), holderDid, null, null, null, null);
-        var vpJwt = Custodian.Companion.getService().createPresentation(List.of(vcJwt), holderDid, null, null, null, expiration);
+        var vpJsonLd = Custodian.Companion.getService().createPresentation(List.of(new PresentableCredential(VerifiableCredential.Companion.fromString(vcJsonLd), null, false)), holderDid, null, null, null, null);
+        var vpJwt = Custodian.Companion.getService().createPresentation(List.of(new PresentableCredential(VerifiableCredential.Companion.fromString(vcJwt), null, false)), holderDid, null, null, null, expiration);
 
         // Verify VPs, using Signature, JsonSchema and a custom policy
         var resJsonLd = Auditor.Companion.getService().verify(vpJsonLd, List.of(new SignaturePolicy(), new JsonSchemaPolicy()));
@@ -51,6 +53,7 @@ public class Credentials {
 
     public ProofConfig createProofConfig(String issuerDid, String subjectDid, ProofType proofType, Instant expiration) {
         return new ProofConfig(issuerDid = issuerDid, subjectDid = subjectDid, null, null, proofType, null, null,
-                null, null, null, null, expiration, null, null, null, Ecosystem.DEFAULT);
+                null, null, null, null, expiration, null, null, null, Ecosystem.DEFAULT,
+                null, "", "", null);
     }
 }
