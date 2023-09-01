@@ -41,7 +41,7 @@ fun customData() {
     }
 
     // Load a VC template
-    val verifiableDiplomaTemplate = VcTemplateService.getService().getTemplate("VerifiableDiploma")
+    val verifiableDiplomaTemplate = VcTemplateService.getService().getTemplate("VerifiableDiploma").template!!
     println("Default Verifiable Diploma - " + verifiableDiplomaTemplate.prettyPrint())
 
     // Prepare desired custom data that should replace the default template data
@@ -55,7 +55,7 @@ fun customData() {
 
     // Populate VC template with custom data
     val verifiableDiploma = MergingDataProvider(data).populate(
-        W3CCredentialBuilder(),
+        W3CCredentialBuilder.fromPartial(verifiableDiplomaTemplate),
         ProofConfig(subjectDid = holderDid, issuerDid = issuerDid, proofType = ProofType.LD_PROOF)
     ).build()
     println("Verifiable Diploma with custom data - " + verifiableDiploma.prettyPrint())
