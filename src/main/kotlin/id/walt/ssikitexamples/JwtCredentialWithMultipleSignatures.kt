@@ -5,6 +5,7 @@ import id.walt.model.DidMethod
 import id.walt.servicematrix.ServiceMatrix
 import id.walt.services.did.DidService
 import id.walt.services.key.KeyService
+import id.walt.signatory.JwtPayloadUpdate
 import id.walt.signatory.ProofConfig
 import id.walt.signatory.ProofType
 import id.walt.signatory.Signatory
@@ -31,13 +32,14 @@ fun getSignature(holderDid: String, payload: Map<String, Any>): JwtHelper {
     val issuerDid = DidService.create(DidMethod.key, issuerKey.id)
 
     val signedVC = Signatory.getService().issue(
-        "VerifiableDiploma",
-        ProofConfig(subjectDid = holderDid, issuerDid = issuerDid, proofType = ProofType.JWT),
+        "UniversityDegree",
+        ProofConfig(subjectDid = holderDid, issuerDid = issuerDid, proofType = ProofType.JWT, jwtPayloadUpdate = JwtPayloadUpdate.NO),
         dataProvider = MergingDataProvider(payload),
         null,
         false
     )
 
+    println("Signature from: $issuerDid")
     println(signedVC)
 
     return JwtHelper(signedVC)
@@ -70,7 +72,7 @@ fun main() {
     val signerTwo = getSignature(holderDid, payload)
 
     if (signerOne.payload != signerTwo.payload) {
-        println("ERROR -> currently this is an issue since the DIDs are embedded in the payload, which should not be the case")
+       throw java.lang.IllegalStateException("The payloads of each signers must match")
     }
 
     // prepare payload of credential
@@ -91,7 +93,7 @@ fun main() {
     )
 
     val signedVC = Signatory.getService().issue(
-        "UniversityDegree",
+        "VerifiableDiploma",
         ProofConfig(subjectDid = holderDid, issuerDid = issuerDid, proofType = ProofType.LD_PROOF),
         dataProvider = MergingDataProvider(data),
         null,

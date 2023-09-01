@@ -80,7 +80,7 @@ public class CustomDataAndPolicy {
     public ProofConfig createProofConfig(String issuerDid, String subjectDid, ProofType proofType, String dataProviderIdentifier) {
         return new ProofConfig(issuerDid, subjectDid, null, null, proofType, null, null,
                 null, null, null, null, null, dataProviderIdentifier, null, null, Ecosystem.DEFAULT,
-                null, "", "", null);
+                null, "", "", null, null);
     }
 }
 

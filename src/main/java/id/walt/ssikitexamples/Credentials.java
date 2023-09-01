@@ -54,6 +54,6 @@ public class Credentials {
     public ProofConfig createProofConfig(String issuerDid, String subjectDid, ProofType proofType, Instant expiration) {
         return new ProofConfig(issuerDid = issuerDid, subjectDid = subjectDid, null, null, proofType, null, null,
                 null, null, null, null, expiration, null, null, null, Ecosystem.DEFAULT,
-                null, "", "", null);
+                null, "", "", null, null);
     }
 }

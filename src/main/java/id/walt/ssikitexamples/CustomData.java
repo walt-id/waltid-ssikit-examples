@@ -61,7 +61,7 @@ public class CustomData {
                 new W3CCredentialBuilder(),
                 new ProofConfig(issuerDid, holderDid, null, null, ProofType.LD_PROOF, null, null,
                         null, null, null, null, null, null, null, null, Ecosystem.DEFAULT,
-                        null, "", "", null)
+                        null, "", "", null, null)
         ).build();
         System.out.println("Verifiable Diploma with custom data - " + verifiableDiploma.encode());
 
