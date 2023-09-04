@@ -1,45 +1,42 @@
 import id.walt.auditor.Auditor
 import id.walt.auditor.policies.SignaturePolicy
+import id.walt.credentials.w3c.W3CIssuer
 import id.walt.crypto.KeyAlgorithm
 import id.walt.model.DidMethod
 import id.walt.servicematrix.ServiceMatrix
 import id.walt.services.did.DidService
 import id.walt.services.key.KeyService
-import id.walt.signatory.JwtPayloadUpdate
 import id.walt.signatory.ProofConfig
 import id.walt.signatory.ProofType
 import id.walt.signatory.Signatory
 import id.walt.signatory.dataproviders.MergingDataProvider
+import java.time.Instant
+import java.util.UUID
 
 
-class JwtHelper(credential: String) {
-    val header: String
-    val payload: String
-    val signature: String
-
-    init {
-        credential.split(".").let {
-            header = it[0]
-            payload = it[1]
-            signature = it[2]
-        }
-    }
+class JwtHelper(val credential: String) {
+    val header get() = credential.substringBefore(".")
+    val payload get() = credential.substringAfter(".").substringBefore(".")
+    val signature get() = credential.substringAfterLast(".")
 }
 
-fun getSignature(holderDid: String, payload: Map<String, Any>): JwtHelper {
-
-    val issuerKey = KeyService.getService().generate(KeyAlgorithm.ECDSA_Secp256k1)
-    val issuerDid = DidService.create(DidMethod.key, issuerKey.id)
-
+fun getSignature(signerVM: String, holderDid: String, payload: Map<String, Any>, issuer: W3CIssuer, credentialId: String, issuedAt: Instant): JwtHelper {
     val signedVC = Signatory.getService().issue(
         "UniversityDegree",
-        ProofConfig(subjectDid = holderDid, issuerDid = issuerDid, proofType = ProofType.JWT, jwtPayloadUpdate = JwtPayloadUpdate.NO),
+        ProofConfig(
+            subjectDid = holderDid,
+            issuerDid = issuer.id,
+            proofType = ProofType.JWT,
+            issuerVerificationMethod = signerVM,
+            credentialId = credentialId,
+            issueDate = issuedAt
+        ),
         dataProvider = MergingDataProvider(payload),
-        null,
+        issuer,
         false
     )
 
-    println("Signature from: $issuerDid")
+    println("Signature from: $signerVM")
     println(signedVC)
 
     return JwtHelper(signedVC)
@@ -55,7 +52,7 @@ fun main() {
     val issuerKey = KeyService.getService().generate(KeyAlgorithm.ECDSA_Secp256k1)
 
     val holderDid = DidService.create(DidMethod.key, holderKey.id)
-    val issuerDid = DidService.create(DidMethod.key, issuerKey.id)
+    val mainIssuerDid = DidService.create(DidMethod.key, issuerKey.id)
 
 
     val payload = mapOf(
@@ -68,8 +65,17 @@ fun main() {
         )
     )
 
-    val signerOne = getSignature(holderDid, payload)
-    val signerTwo = getSignature(holderDid, payload)
+    val credentialId = UUID.randomUUID().toString()
+    val issuedAt = Instant.now()
+    val signerOneDid = DidService.create(DidMethod.key)
+    val signerTwoDid = DidService.create(DidMethod.key)
+    val issuer = W3CIssuer(mainIssuerDid, properties = mapOf(
+        "signer1" to signerOneDid,
+        "signer2" to signerTwoDid
+    ))
+
+    val signerOne = getSignature(signerOneDid, holderDid, payload, issuer, credentialId, issuedAt)
+    val signerTwo = getSignature(signerTwoDid, holderDid, payload, issuer, credentialId, issuedAt)
 
     if (signerOne.payload != signerTwo.payload) {
        throw java.lang.IllegalStateException("The payloads of each signers must match")
@@ -94,9 +100,15 @@ fun main() {
 
     val signedVC = Signatory.getService().issue(
         "VerifiableDiploma",
-        ProofConfig(subjectDid = holderDid, issuerDid = issuerDid, proofType = ProofType.LD_PROOF),
+        ProofConfig(
+            subjectDid = holderDid,
+            issuerDid = issuer.id,
+            proofType = ProofType.LD_PROOF,
+            credentialId = credentialId,
+            issueDate = issuedAt
+        ),
         dataProvider = MergingDataProvider(data),
-        null,
+        issuer,
         false
     )
 
