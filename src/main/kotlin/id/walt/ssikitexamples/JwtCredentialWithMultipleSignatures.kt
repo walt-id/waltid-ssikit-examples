@@ -70,8 +70,7 @@ fun main() {
     val signerOneDid = DidService.create(DidMethod.key)
     val signerTwoDid = DidService.create(DidMethod.key)
     val issuer = W3CIssuer(mainIssuerDid, properties = mapOf(
-        "signer1" to signerOneDid,
-        "signer2" to signerTwoDid
+        "sub_issuers" to listOf(signerOneDid, signerTwoDid)
     ))
 
     val signerOne = getSignature(signerOneDid, holderDid, payload, issuer, credentialId, issuedAt)
@@ -103,7 +102,7 @@ fun main() {
         ProofConfig(
             subjectDid = holderDid,
             issuerDid = issuer.id,
-            proofType = ProofType.LD_PROOF,
+            proofType = ProofType.JWT,
             credentialId = credentialId,
             issueDate = issuedAt
         ),
