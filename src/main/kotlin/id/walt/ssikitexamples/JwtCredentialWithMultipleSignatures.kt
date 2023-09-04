@@ -1,15 +1,24 @@
 import id.walt.auditor.Auditor
+import id.walt.auditor.VerificationPolicy
+import id.walt.auditor.VerificationPolicyResult
 import id.walt.auditor.policies.SignaturePolicy
+import id.walt.credentials.w3c.VerifiableCredential
 import id.walt.credentials.w3c.W3CIssuer
+import id.walt.credentials.w3c.builder.W3CCredentialBuilder
 import id.walt.crypto.KeyAlgorithm
 import id.walt.model.DidMethod
 import id.walt.servicematrix.ServiceMatrix
 import id.walt.services.did.DidService
+import id.walt.services.jwt.JwtService
 import id.walt.services.key.KeyService
 import id.walt.signatory.ProofConfig
 import id.walt.signatory.ProofType
 import id.walt.signatory.Signatory
 import id.walt.signatory.dataproviders.MergingDataProvider
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.jsonArray
 import java.time.Instant
 import java.util.UUID
 
@@ -18,6 +27,18 @@ class JwtHelper(val credential: String) {
     val header get() = credential.substringBefore(".")
     val payload get() = credential.substringAfter(".").substringBefore(".")
     val signature get() = credential.substringAfterLast(".")
+    val jwsSignaturePart get() = mapOf(
+        "protected" to header,
+        "signature" to signature
+    )
+
+    companion object {
+        fun fromJWS(payload: String, sig: Map<String, String>): JwtHelper {
+            val h = sig["protected"] ?: throw Exception("No header found")
+            val s = sig["signature"] ?: throw Exception("No sig found")
+            return JwtHelper("$h.$payload.$s")
+        }
+    }
 }
 
 fun getSignature(signerVM: String, holderDid: String, payload: Map<String, Any>, issuer: W3CIssuer, credentialId: String, issuedAt: Instant): JwtHelper {
@@ -69,36 +90,23 @@ fun main() {
     val issuedAt = Instant.now()
     val signerOneDid = DidService.create(DidMethod.key)
     val signerTwoDid = DidService.create(DidMethod.key)
+    val subIssuers = listOf(signerOneDid, signerTwoDid)
     val issuer = W3CIssuer(mainIssuerDid, properties = mapOf(
-        "sub_issuers" to listOf(signerOneDid, signerTwoDid)
+        "sub_issuers" to subIssuers
     ))
 
-    val signerOne = getSignature(signerOneDid, holderDid, payload, issuer, credentialId, issuedAt)
-    val signerTwo = getSignature(signerTwoDid, holderDid, payload, issuer, credentialId, issuedAt)
+    val signatures = subIssuers.map { getSignature(it, holderDid, payload, issuer, credentialId, issuedAt) }
 
-    if (signerOne.payload != signerTwo.payload) {
+    if (!signatures.all { it.payload == signatures.first().payload }) {
        throw java.lang.IllegalStateException("The payloads of each signers must match")
     }
 
-    // prepare payload of credential
-    val data = mapOf(
-        "credentialSubject" to mapOf(
-            "id" to holderDid,
-            "payload" to signerOne.payload,
-            "signatures" to listOf(
-                mapOf(
-                    "protected" to signerOne.header,
-                    "signature" to signerOne.signature
-                ), mapOf(
-                    "protected" to signerTwo.header,
-                    "signature" to signerTwo.signature
-                )
-            )
-        )
-    )
-
     val signedVC = Signatory.getService().issue(
-        "VerifiableDiploma",
+        W3CCredentialBuilder(listOf("VerifiableCredential", "JWSMultiSigCredential")).buildSubject {
+            setId(holderDid)
+            setProperty("payload", signatures.first().payload)
+            setProperty("signatures", signatures.map { it.jwsSignaturePart })
+        },
         ProofConfig(
             subjectDid = holderDid,
             issuerDid = issuer.id,
@@ -106,7 +114,6 @@ fun main() {
             credentialId = credentialId,
             issueDate = issuedAt
         ),
-        dataProvider = MergingDataProvider(data),
         issuer,
         false
     )
@@ -115,9 +122,23 @@ fun main() {
     println(signedVC)
 
     // TODO: Add policy that verifies the signatures of the payload
-    val verificationResult = Auditor.getService().verify(signedVC, listOf(SignaturePolicy()))
+    val verificationResult = Auditor.getService().verify(signedVC, listOf(SignaturePolicy(), MultiSignaturePolicy()))
 
     println(verificationResult)
 
 
+}
+
+class MultiSignaturePolicy: VerificationPolicy() {
+    override val description: String
+        get() = "JWS Multi Signature Verification Policy"
+
+    override fun doVerify(vc: VerifiableCredential): VerificationPolicyResult {
+        val payload = (vc.credentialSubject?.properties?.get("payload") as? String) ?: return VerificationPolicyResult.failure()
+        val signatures = (vc.credentialSubject?.properties?.get("signatures") as? List<Map<String, String>>) ?: return VerificationPolicyResult.failure()
+        val credentials = signatures.map { JwtHelper.fromJWS(payload, it).credential }
+        return if(credentials.all { SignaturePolicy().verify(VerifiableCredential.fromString(it)).isSuccess }) {
+            VerificationPolicyResult.success()
+        } else VerificationPolicyResult.failure()
+    }
 }
