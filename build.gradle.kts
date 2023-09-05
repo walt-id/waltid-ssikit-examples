@@ -1,6 +1,6 @@
 plugins {
-    kotlin("jvm") version "1.7.10"
-    kotlin("plugin.serialization") version "1.6.10"
+    kotlin("jvm") version "1.9.10"
+    kotlin("plugin.serialization") version "1.9.10"
     java
     application
 }
@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     // walt.id
-    implementation("id.walt:waltid-ssikit:1.2308021811.0")
+    implementation("id.walt:waltid-ssikit:1.2308302143.0")
     implementation("id.walt:waltid-sd-jwt-jvm:1.2306191408.0")
     implementation("id.walt.servicematrix:WaltID-ServiceMatrix:1.1.3")
 
@@ -38,4 +38,14 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions.jvmTarget = "17"
 }

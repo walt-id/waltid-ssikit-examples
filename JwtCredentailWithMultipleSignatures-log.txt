@@ -1,0 +1,87 @@
+{"vc":{"type":["VerifiableCredential","UniversityDegreeCredential"],"@context":["https://www.w3.org/2018/credentials/v1","https://www.w3.org/2018/credentials/examples/v1"],"id":"http://example.gov/credentials/3732","issuer":{"id":"did:example:456"},"issued":"2020-03-10T04:24:12.164Z","credentialSubject":{"id":"did:example:123","degree":[{"name":"Bachelor of Science and Arts"}]}}}
+Signature from: did:key:zQ3shXtCNC1Sqy1LPBP5fff7JNwbmWAyPzW1zNvJ5JCtW7QMw
+eyJraWQiOiJkaWQ6a2V5OnpRM3NoWHRDTkMxU3F5MUxQQlA1ZmZmN0pOd2JtV0F5UHpXMXpOdko1SkN0VzdRTXcjelEzc2hYdENOQzFTcXkxTFBCUDVmZmY3Sk53Ym1XQXlQelcxek52SjVKQ3RXN1FNdyIsInR5cCI6IkpXVCIsImFsZyI6IkVTMjU2SyJ9.eyJ2YyI6eyJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiVW5pdmVyc2l0eURlZ3JlZUNyZWRlbnRpYWwiXSwiQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy9leGFtcGxlcy92MSJdLCJpZCI6Imh0dHA6Ly9leGFtcGxlLmdvdi9jcmVkZW50aWFscy8zNzMyIiwiaXNzdWVyIjp7ImlkIjoiZGlkOmV4YW1wbGU6NDU2In0sImlzc3VlZCI6IjIwMjAtMDMtMTBUMDQ6MjQ6MTIuMTY0WiIsImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImlkIjoiZGlkOmV4YW1wbGU6MTIzIiwiZGVncmVlIjpbeyJuYW1lIjoiQmFjaGVsb3Igb2YgU2NpZW5jZSBhbmQgQXJ0cyJ9XX19fQ.OaipxDVCwMXX4wHl1z-gP2VeMmua5n0MleU9zqq4bdSWcy9y-g5WnUcgcFVdqw6x31oqb2O8H-lMUsgB32z-2A
+
+{"vc":{"type":["VerifiableCredential","UniversityDegreeCredential"],"@context":["https://www.w3.org/2018/credentials/v1","https://www.w3.org/2018/credentials/examples/v1"],"id":"http://example.gov/credentials/3732","issuer":{"id":"did:example:456"},"issued":"2020-03-10T04:24:12.164Z","credentialSubject":{"id":"did:example:123","degree":[{"name":"Bachelor of Science and Arts"}]}}}
+Signature from: did:key:zQ3shWmhzWihXHLtpr9t32bcysngVTMRAzGgf4zc5VnTjC4ev
+eyJraWQiOiJkaWQ6a2V5OnpRM3NoV21oeldpaFhITHRwcjl0MzJiY3lzbmdWVE1SQXpHZ2Y0emM1Vm5UakM0ZXYjelEzc2hXbWh6V2loWEhMdHByOXQzMmJjeXNuZ1ZUTVJBekdnZjR6YzVWblRqQzRldiIsInR5cCI6IkpXVCIsImFsZyI6IkVTMjU2SyJ9.eyJ2YyI6eyJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiVW5pdmVyc2l0eURlZ3JlZUNyZWRlbnRpYWwiXSwiQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy9leGFtcGxlcy92MSJdLCJpZCI6Imh0dHA6Ly9leGFtcGxlLmdvdi9jcmVkZW50aWFscy8zNzMyIiwiaXNzdWVyIjp7ImlkIjoiZGlkOmV4YW1wbGU6NDU2In0sImlzc3VlZCI6IjIwMjAtMDMtMTBUMDQ6MjQ6MTIuMTY0WiIsImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImlkIjoiZGlkOmV4YW1wbGU6MTIzIiwiZGVncmVlIjpbeyJuYW1lIjoiQmFjaGVsb3Igb2YgU2NpZW5jZSBhbmQgQXJ0cyJ9XX19fQ.TaQNzq7ZhpBH6mkKiwvjoI_8DC7NMVyvjWnYxcKOBmZpEDZbQIYPTY8RN4Qrn5d_uLnOYjix61K473N3u78BRg
+
+{
+  "type" : [ "VerifiableCredential", "VerifiableAttestation", "VerifiableDiploma" ],
+  "@context" : [ "https://www.w3.org/2018/credentials/v1", "https://w3id.org/security/suites/jws-2020/v1" ],
+  "id" : "urn:uuid:1d10e4cf-0b9f-41d8-ab97-2eaea1e74f20",
+  "issuer" : "did:key:zQ3shj1NT9t2tisAZAduCgJESkm293wAJ1uH5UKJxC4cvCoTL",
+  "issuanceDate" : "2023-09-01T15:20:43Z",
+  "issued" : "2023-09-01T15:20:43Z",
+  "validFrom" : "2023-09-01T15:20:43Z",
+  "expirationDate" : "2022-08-31T00:00:00Z",
+  "credentialSchema" : {
+    "id" : "https://raw.githubusercontent.com/walt-id/waltid-ssikit-vclib/master/src/test/resources/schemas/VerifiableDiploma.json",
+    "type" : "JsonSchemaValidator2018"
+  },
+  "credentialSubject" : {
+    "id" : "did:key:z4MXj1wBzi9jUstyNZujpkh4N3syXyKWup1UX7S58UyAr1CvTqxiQiBu9WtTxE3imFVCGmanpHjDDquMbXyZzXyVcUMwMnamPHfAHZArRj4i2qSSFzDaa5HDBziiKg46nFeJREisuHGyW35iELx1D3RiT4jXxZGgKxDLsviZm1Kyv4XgoBSUoXzPTEhu6TNiJxnhgWNVp66DYXurkU6pSsQMkW4oGcBPFacwarkrukSiw2WbWzHQJU1KPuCKSJN5mRY9nyZgcCnFioK9wK2FmQWrdDnmSS18pbYoxB9QwHFPBzRfyTqbwQkeiGEUWrfuqkrQGxqqYZeiBFGC4QQ1dzEh2unkzpNBZFp3goNatRhu9T9FguiTA",
+    "awardingOpportunity" : {
+      "awardingBody" : {
+        "eidasLegalIdentifier" : "Unknown",
+        "homepage" : "https://leaston.bcdiploma.com/",
+        "id" : "did:ebsi:2A9BZ9SUe6BatacSpvs1V5CdjHvLpQ7bEsi2Jb6LdHKnQxaN",
+        "preferredName" : "Leaston University",
+        "registration" : "0597065J"
+      },
+      "endedAtTime" : "2020-06-26T00:00:00Z",
+      "id" : "https://leaston.bcdiploma.com/law-economics-management#AwardingOpportunity",
+      "identifier" : "https://certificate-demo.bcdiploma.com/check/87ED2F2270E6C41456E94B86B9D9115B4E35BCCAD200A49B846592C14F79C86BV1Fnbllta0NZTnJkR3lDWlRmTDlSRUJEVFZISmNmYzJhUU5sZUJ5Z2FJSHpWbmZZ",
+      "location" : "FRANCE",
+      "startedAtTime" : "2019-09-02T00:00:00Z"
+    },
+    "dateOfBirth" : "1993-04-08",
+    "familyName" : "DOE",
+    "givenNames" : "Jane",
+    "gradingScheme" : {
+      "id" : "https://leaston.bcdiploma.com/law-economics-management#GradingScheme",
+      "title" : "Lower Second-Class Honours"
+    },
+    "identifier" : "0904008084H",
+    "learningAchievement" : {
+      "additionalNote" : [ "DISTRIBUTION MANAGEMENT" ],
+      "description" : "MARKETING AND SALES",
+      "id" : "https://leaston.bcdiploma.com/law-economics-management#LearningAchievment",
+      "title" : "MASTERS LAW, ECONOMICS AND MANAGEMENT"
+    },
+    "learningSpecification" : {
+      "ectsCreditPoints" : 120,
+      "eqfLevel" : 7,
+      "id" : "https://leaston.bcdiploma.com/law-economics-management#LearningSpecification",
+      "iscedfCode" : [ "7" ],
+      "nqfLevel" : [ "7" ]
+    },
+    "payload" : "eyJ2YyI6eyJ0eXBlIjpbIlZlcmlmaWFibGVDcmVkZW50aWFsIiwiVW5pdmVyc2l0eURlZ3JlZUNyZWRlbnRpYWwiXSwiQGNvbnRleHQiOlsiaHR0cHM6Ly93d3cudzMub3JnLzIwMTgvY3JlZGVudGlhbHMvdjEiLCJodHRwczovL3d3dy53My5vcmcvMjAxOC9jcmVkZW50aWFscy9leGFtcGxlcy92MSJdLCJpZCI6Imh0dHA6Ly9leGFtcGxlLmdvdi9jcmVkZW50aWFscy8zNzMyIiwiaXNzdWVyIjp7ImlkIjoiZGlkOmV4YW1wbGU6NDU2In0sImlzc3VlZCI6IjIwMjAtMDMtMTBUMDQ6MjQ6MTIuMTY0WiIsImNyZWRlbnRpYWxTdWJqZWN0Ijp7ImlkIjoiZGlkOmV4YW1wbGU6MTIzIiwiZGVncmVlIjpbeyJuYW1lIjoiQmFjaGVsb3Igb2YgU2NpZW5jZSBhbmQgQXJ0cyJ9XX19fQ",
+    "signatures" : [ {
+      "protected" : "eyJraWQiOiJkaWQ6a2V5OnpRM3NoWHRDTkMxU3F5MUxQQlA1ZmZmN0pOd2JtV0F5UHpXMXpOdko1SkN0VzdRTXcjelEzc2hYdENOQzFTcXkxTFBCUDVmZmY3Sk53Ym1XQXlQelcxek52SjVKQ3RXN1FNdyIsInR5cCI6IkpXVCIsImFsZyI6IkVTMjU2SyJ9",
+      "signature" : "OaipxDVCwMXX4wHl1z-gP2VeMmua5n0MleU9zqq4bdSWcy9y-g5WnUcgcFVdqw6x31oqb2O8H-lMUsgB32z-2A"
+    }, {
+      "protected" : "eyJraWQiOiJkaWQ6a2V5OnpRM3NoV21oeldpaFhITHRwcjl0MzJiY3lzbmdWVE1SQXpHZ2Y0emM1Vm5UakM0ZXYjelEzc2hXbWh6V2loWEhMdHByOXQzMmJjeXNuZ1ZUTVJBekdnZjR6YzVWblRqQzRldiIsInR5cCI6IkpXVCIsImFsZyI6IkVTMjU2SyJ9",
+      "signature" : "TaQNzq7ZhpBH6mkKiwvjoI_8DC7NMVyvjWnYxcKOBmZpEDZbQIYPTY8RN4Qrn5d_uLnOYjix61K473N3u78BRg"
+    } ]
+  },
+  "credentialStatus" : {
+    "id" : "https://essif.europa.eu/status/education#higherEducation#392ac7f6-399a-437b-a268-4691ead8f176",
+    "type" : "CredentialStatusList2020"
+  },
+  "evidence" : {
+    "documentPresence" : [ "Physical" ],
+    "evidenceDocument" : [ "Passport" ],
+    "id" : "https://essif.europa.eu/tsr-va/evidence/f2aeec97-fc0d-42bf-8ca7-0548192d5678",
+    "subjectPresence" : "Physical",
+    "type" : [ "DocumentVerification" ],
+    "verifier" : "did:ebsi:2962fb784df61baa267c8132497539f8c674b37c1244a7a"
+  },
+  "proof" : {
+    "type" : "JsonWebSignature2020",
+    "creator" : "did:key:zQ3shj1NT9t2tisAZAduCgJESkm293wAJ1uH5UKJxC4cvCoTL",
+    "created" : "2023-09-01T15:20:43Z",
+    "verificationMethod" : "did:key:zQ3shj1NT9t2tisAZAduCgJESkm293wAJ1uH5UKJxC4cvCoTL#zQ3shj1NT9t2tisAZAduCgJESkm293wAJ1uH5UKJxC4cvCoTL",
+    "jws" : "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJFUzI1NksifQ..UHdHOqbr29tpIgX6mcW4xAynJXt0PpyUNhPj7b5-nkz6FFjhzFUbX-aolCsVqJId-BDciH8HW8fskxLbEiLpqQ"
+  }
+}
