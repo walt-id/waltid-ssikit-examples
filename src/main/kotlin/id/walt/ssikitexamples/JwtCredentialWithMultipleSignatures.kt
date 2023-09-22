@@ -6,6 +6,8 @@ import id.walt.credentials.w3c.VerifiableCredential
 import id.walt.credentials.w3c.W3CIssuer
 import id.walt.credentials.w3c.builder.W3CCredentialBuilder
 import id.walt.crypto.KeyAlgorithm
+import id.walt.crypto.decBase64
+import id.walt.crypto.decBase64Str
 import id.walt.model.DidMethod
 import id.walt.servicematrix.ServiceMatrix
 import id.walt.services.did.DidService
@@ -21,6 +23,7 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import java.time.Instant
 import java.util.UUID
+import kotlin.io.encoding.Base64
 
 
 class JwtHelper(val credential: String) {
@@ -36,7 +39,9 @@ class JwtHelper(val credential: String) {
         fun fromJWS(payload: String, sig: Map<String, String>): JwtHelper {
             val h = sig["protected"] ?: throw Exception("No header found")
             val s = sig["signature"] ?: throw Exception("No sig found")
-            return JwtHelper("$h.$payload.$s")
+            val jwt = "$h.$payload.$s"
+            println("JWT: $jwt")
+            return JwtHelper(jwt)
         }
     }
 }
@@ -57,10 +62,12 @@ fun getSignature(signerVM: String, holderDid: String, payload: Map<String, Any>,
         false
     )
 
-    println("Signature from: $signerVM")
-    println(signedVC)
-
-    return JwtHelper(signedVC)
+    println("Signature from: $signerVM\n")
+    return JwtHelper(signedVC).apply {
+        println("\tHeader: ${this.header} => ${decBase64Str(header)}\n")
+        println("\tPayload: ${this.payload} =>  ${decBase64Str(this.payload)}\n")
+        println("\tSignature: ${signature}\n")
+    }
 }
 
 fun main() {
@@ -119,12 +126,11 @@ fun main() {
     )
 
 
-    println(signedVC)
+    println("Credential: $signedVC\n")
 
-    // TODO: Add policy that verifies the signatures of the payload
     val verificationResult = Auditor.getService().verify(signedVC, listOf(SignaturePolicy(), MultiSignaturePolicy()))
 
-    println(verificationResult)
+    println("Result: ${verificationResult}")
 
 
 }
