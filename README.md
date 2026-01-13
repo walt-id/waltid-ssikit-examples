@@ -1,9 +1,15 @@
+## 🚨 Repository Moved
+
+> [!IMPORTANT]
+> This repository is no longer maintained.
+> 
+> All walt.id development continues in the monorepo:
+> 
+### 👉 Code **https://github.com/walt-id/waltid-identity** & Docs **https://docs.walt.id**
+
+
 # walt.id SSI-Kit example project
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=walt-id_waltid-ssikit-examples&metric=security_rating)](https://sonarcloud.io/dashboard?id=walt-id_waltid-ssikit-examples)
-[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=walt-id_waltid-ssikit-examples&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=walt-id_waltid-ssikit-examples)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=walt-id_waltid-ssikit-examples&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=walt-id_waltid-ssikit-examples)
-[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=walt-id_waltid-ssikit-examples&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=walt-id_waltid-ssikit-examples)
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=walt-id_waltid-ssikit-examples&metric=ncloc)](https://sonarcloud.io/dashboard?id=walt-id_waltid-ssikit-examples)
+
 
 [comment]: <> ([![Technical Debt]&#40;https://sonarcloud.io/api/project_badges/measure?project=walt-id_waltid-ssikit-examples&metric=sqale_index&#41;]&#40;https://sonarcloud.io/dashboard?id=walt-id_waltid-ssikit-examples&#41;)
 
